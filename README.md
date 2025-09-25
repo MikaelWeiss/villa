@@ -1,7 +1,8 @@
-# Public URL
-https://villa.fly.dev
+# Villa
 
-# Getting Started with Create React App
+**Public URL:** https://villa.fly.dev
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
