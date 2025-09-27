@@ -6,24 +6,6 @@ import styles from "./TenantDashboard.module.css";
 
 
 function TenantDashboard() {
-    const nav = <Nav navElements={[
-        {
-            name: "Dashboard",
-            id: crypto.randomUUID(),
-            icon: "https://placehold.co/30"
-        },
-        {
-            name: "Payments",
-            id: crypto.randomUUID(),
-            icon: "https://placehold.co/30"
-        },
-        {
-            name: "Maintenance",
-            id: crypto.randomUUID(),
-            icon: "https://placehold.co/30"
-        },
-
-    ]} />
     const balanceContent = (
         <div className={styles.textContainer}>
             <h2>Balance</h2>
@@ -39,7 +21,7 @@ function TenantDashboard() {
         </div>
     )
     
-    const content = (
+    return (
         <div className={styles.content}>
             <h1 className={styles.title}>Dashboard</h1>
             <div className={styles.cardContainer}>
@@ -63,9 +45,6 @@ function TenantDashboard() {
                 ></TenantPreviewCard>
             </div>
         </div>
-    )
-    return (
-        <Layout nav={nav} content={content} />
     )
 }
 

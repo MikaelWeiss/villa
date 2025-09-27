@@ -14,7 +14,7 @@
     flex-direction: column;
     height: 100%;
     gap: 3rem;
-    background: linear-gradient(#333, #000);
+    background: linear-gradient(#2b2b2b, #0a0a0a);
     padding: 40px;
 }
 

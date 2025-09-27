@@ -2,7 +2,6 @@
     display: grid;
     grid-template-columns: 3fr 10fr;
     height: 100%;
-    background-color: #F2F4F3;
-    /*grid-gap: 20px;*/
+    background-color: black;
 }
 
