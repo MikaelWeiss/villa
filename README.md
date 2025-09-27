@@ -72,3 +72,88 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Firebase + Auth + Firestore Setup (Vill)
+
+1) Create Firebase project and web app
+- Go to the Firebase console and create a project.
+- Add a Web app; copy the config keys.
+- Create a `.env.local` file in the project root with:
+
+```
+REACT_APP_FIREBASE_API_KEY=your_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=xxxxxx
+REACT_APP_FIREBASE_APP_ID=1:xxxx:web:xxxx
+```
+
+2) Enable Authentication
+- In Firebase console -> Authentication -> Sign-in method -> enable Google.
+
+3) Enable Firestore
+- Create a Cloud Firestore database in Production mode.
+- Suggested security rules for basic tenant-only access to their own reports (adjust to your needs):
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /reports/{reportId} {
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.tenantUid;
+      allow create: if request.auth != null && request.resource.data.tenantUid == request.auth.uid;
+    }
+  }
+}
+```
+
+4) Run locally
+- `npm start`
+
+App structure for auth and data:
+- `src/firebase.js`: initializes Firebase (Auth, Firestore) from env vars.
+- `src/AuthContext.js`: provides user state, Google sign-in, and sign out.
+- `src/App.js`: routes between Sign-in and Dashboard.
+- `src/Reports.js`: create and list reports for the signed-in user.
+
+## Deploying to Fly.io
+
+This is a React single-page app. Common approaches on Fly.io:
+- Build a container that runs a static file server (e.g., `serve`) for the production build.
+- Or use Fly Machines/Apps to serve the `build/` directory.
+
+Minimal steps:
+1) Add a Dockerfile that builds and serves CRA:
+
+```
+# Use node to build
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Serve static files
+FROM pierrezemb/gostatic
+COPY --from=build /app/build /srv/http
+```
+
+2) Create `fly.toml` with static port 80 exposure, then:
+- `flyctl launch` (choose yes to set up, no to deploy if you still need to set env)
+- Set environment variables in Fly secrets (they become runtime env for the build only if you build on Fly; for static serve, env is not required at runtime):
+
+```
+flyctl secrets set \
+  REACT_APP_FIREBASE_API_KEY=xxx \
+  REACT_APP_FIREBASE_AUTH_DOMAIN=xxx \
+  REACT_APP_FIREBASE_PROJECT_ID=xxx \
+  REACT_APP_FIREBASE_STORAGE_BUCKET=xxx \
+  REACT_APP_FIREBASE_MESSAGING_SENDER_ID=xxx \
+  REACT_APP_FIREBASE_APP_ID=xxx
+```
+
+Notes:
+- CRA reads `REACT_APP_*` at build time. When building inside Fly, set secrets before the build. If you build locally, ensure `.env.production` or your local env has the keys before `npm run build`, and deploy the built files.
+- If you need role-based manager access later, add custom claims via Firebase Admin (requires a backend) or store roles in Firestore with rule checks.
