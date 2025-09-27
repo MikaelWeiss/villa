@@ -1,13 +1,15 @@
 .li {
-    background-color: #111;
+    background-color: transparent;
     width: 100%;
     margin: 0;
-    padding: 30px;
+    padding-block: 20px;
+    padding-inline: 10px;
     border-radius: 10px;
+
 }
 
 .li:hover {
-    background-color: #050505;
+    /*background-color: #050505;*/
 }
 
 .a {
@@ -16,6 +18,8 @@
     align-items: center;
     justify-content: flex-start;
     gap: 1.5rem;
-    color: white;
+    color: #bbb;
     text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
 }

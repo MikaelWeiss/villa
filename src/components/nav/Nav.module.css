@@ -3,8 +3,9 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    background-color: #333;
-    border-radius: 1rem;
+    background-color: #111;
+    /*border-right: 2px solid #a9927d*/
+    
 }
 
 .elementsList {
@@ -16,5 +17,4 @@
     list-style: none;
     gap: 20px;
     padding: 20px;
-    
 }

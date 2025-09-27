@@ -41,14 +41,14 @@ function TenantDashboard() {
     
     const content = (
         <div className={styles.content}>
-            <h1>Dashboard</h1>
+            <h1 className={styles.title}>Dashboard</h1>
             <div className={styles.cardContainer}>
                 <TenantPreviewCard
                     icon="https://placehold.co/50"
                     infoComponent={balanceContent}
                     buttons={[
-                        {link: "#", text: "Test1"},
-                        {link: "#", text: "Test2"}
+                        {link: "#", text: "Pay Now"},
+                        {link: "#", text: "History"}
                     ]}
         
                 ></TenantPreviewCard>
@@ -57,8 +57,7 @@ function TenantDashboard() {
                     icon="https://placehold.co/50"
                     infoComponent={maintenanceContent}
                     buttons={[
-                        {link: "#", text: "Test1"},
-                        {link: "#", text: "Test2"}
+                        {link: "#", text: "New Request"}
                     ]}
         
                 ></TenantPreviewCard>
