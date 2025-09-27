@@ -1,0 +1,9 @@
+.appLayout {
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+    height: 100%;
+    background-color: #444488;
+    grid-gap: 20px;
+    padding: 20px;
+}
+

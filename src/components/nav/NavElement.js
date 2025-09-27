@@ -1,10 +1,10 @@
-import style from "./NavElement.module.css";
+import styles from "./NavElement.module.css";
 
 function NavElement({ elementInfo }) {
     return (
-        <li key={elementInfo.id} className={style.li}>
-            <a href="#" className={style.a}>
-                <img src={elementInfo.icon} alt="#" /><span>{elementInfo.name}</span>
+        <li key={elementInfo.id} className={styles.li}>
+            <a href="#" className={styles.a}>
+                <img src={elementInfo.icon} alt="#" className={styles.img}/><span className={styles.name}>{elementInfo.name}</span>
             </a>
         </li>
     )

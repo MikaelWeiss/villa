@@ -1,16 +1,16 @@
-li {
-    background-color: #222222;
+.li {
+    background-color: #111;
     width: 100%;
     margin: 0;
     padding: 30px;
     border-radius: 10px;
 }
 
-li:hover {
-    background-color: #1b1b1b;
+.li:hover {
+    background-color: #050505;
 }
 
-a {
+.a {
     display: flex;
     flex-direction: row;
     align-items: center;
