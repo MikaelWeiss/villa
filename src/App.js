@@ -45,40 +45,6 @@ function App() {
             </>
         </BrowserRouter>
     )
-    
-    
-    
-    
-    
-    
-    // return (
-    //     <>
-    //         <Layout 
-    //             nav={<Nav navElements={[
-    //                 {
-    //                     name: "Dashboard",
-    //                     id: crypto.randomUUID(),
-    //                     icon: "https://placehold.co/30",
-    //                     path: "/pages/tenant/TenantDashboard",
-    //                 },
-    //                 {
-    //                     name: "Payments",
-    //                     id: crypto.randomUUID(),
-    //                     icon: "https://placehold.co/30",
-    //                     path: "/pages/tenant/TenantPayments",
-    //                 },
-    //                 {
-    //                     name: "Maintenance",
-    //                     id: crypto.randomUUID(),
-    //                     icon: "https://placehold.co/30",
-    //                     path: "/pages/tenant/TenantMaintenance"
-    //                 }
-    //                 ]}
-    //             />}
-    //             page={<TenantDashboard />}
-    //         />
-    //     </>
-    // )
 }
 
 export default App;

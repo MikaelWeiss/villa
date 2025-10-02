@@ -10,6 +10,7 @@ function TenantPreviewCard({ icon, infoComponent, buttons}) {
                     <ButtonLink 
                         link={button.link} 
                         text={button.text}
+                        key={crypto.randomUUID()}
                     />
                 ))}
             </div>

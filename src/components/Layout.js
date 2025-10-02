@@ -10,14 +10,4 @@ function Layout({ nav, routes }) {
     );
 }
 
-
-// function Layout({ nav, page }) {
-//     return (
-//         <div className={styles.appLayout}>
-//             <span className={styles.nav}>{nav}</span>
-//             <span className={styles.page}>{page}</span>
-//         </div>
-//     );
-// }
-
 export default Layout;
