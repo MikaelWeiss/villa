@@ -4,6 +4,8 @@ import TenantPayments from "./pages/tenant/TenantPayments";
 import TenantMaintenance from "./pages/tenant/TenantMaintenance";
 import Layout from "./components/Layout.js"
 import Nav from "./components/nav/Nav.js"
+import { AuthProvider } from './authentication';
+import AppRoutes from './routes/AppRoutes';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -45,6 +47,4 @@ function App() {
             </>
         </BrowserRouter>
     )
-}
 
-export default App;
