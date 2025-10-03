@@ -1,48 +1,95 @@
 import Nav from '../../components/nav/Nav.js';
 import TenantPreviewCard from "../../components/TenantPreviewCard";
-import ButtonLink from "../../components/ButtonLink";
-import Layout from "../../components/Layout.js";
 import styles from "./TenantDashboard.module.css";
+import TenantMaintenanceList from "../../components/TenantMaintenanceList";
+import NewTicketModal from "../../components/NewTicketModal";
+import {useState} from "react";
+import { Wrench, House, CreditCard } from "lucide-react";
 
 
 function TenantDashboard() {
+    const [isOpen, setIsOpen] = useState(false);
+    const nav = 
+        (<Nav navElements={[
+            {
+                name: "Dashboard",
+                id: crypto.randomUUID(),
+                icon: <House size={20} />,
+                path: "/tenantDashboard",
+            },
+            {
+                name: "Payments",
+                id: crypto.randomUUID(),
+                icon: <CreditCard size={20} />,
+                path: "/tenantPayments",
+            },
+            {
+                name: "Maintenance",
+                id: crypto.randomUUID(),
+                icon: <Wrench size={20} />,
+                path: "/tenantMaintenance"
+            }
+        ]}
+        />)
+    
+    
     const balanceContent = (
         <div className={styles.textContainer}>
-            <h2>Balance</h2>
+            <h3>Balance</h3>
             <p>$0.00</p>
         </div>
     )
     
+    const placeholderTxObjects = [
+        {
+            id: crypto.randomUUID(),
+            title: "Dishwasher",
+            date: "Oct 2, 2025",
+            severity: "urgent",
+            description: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.",
+        },
+        {
+            id: crypto.randomUUID(),
+            title: "Screen Door",
+            date: "Oct 2, 2025",
+            severity: "low",
+            description: "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.",
+        },
+    ]
+    
     const maintenanceContent = (
-        <div className={styles.textContainer}>
-            <h2>Maintenance Requests</h2>
-            <p>some requests here</p>
-            <a href="#">see all</a>
+        <div className={styles.maintenanceContainer}>
+            <div className={styles.maintenanceHeader}>
+                <h2>Maintenance Requests</h2> 
+                <button 
+                    className={styles.button}
+                    onClick={() => setIsOpen(true)}>
+                    New Request
+                </button>
+            </div>
+            <hr />
+            <TenantMaintenanceList tickets={placeholderTxObjects} />
         </div>
     )
     
     return (
-        <div className={styles.content}>
-            <h1 className={styles.title}>Dashboard</h1>
-            <div className={styles.cardContainer}>
-                <TenantPreviewCard
-                    icon="https://placehold.co/50"
-                    infoComponent={balanceContent}
-                    buttons={[
-                        {link: "#", text: "Pay Now"},
-                        {link: "#", text: "History"}
-                    ]}
-        
-                ></TenantPreviewCard>
-        
-                <TenantPreviewCard
-                    icon="https://placehold.co/50"
-                    infoComponent={maintenanceContent}
-                    buttons={[
-                        {link: "#", text: "New Request"}
-                    ]}
-        
-                ></TenantPreviewCard>
+        <div className={styles.container}>
+            {nav}
+            {isOpen && (<NewTicketModal setIsOpen={setIsOpen}/>)}
+            <div className={styles.content}>
+                <h1 className={styles.title}>Dashboard</h1>
+                <div className={styles.cardContainer}>
+                    <TenantPreviewCard
+                        icon=<CreditCard size={130} />
+                        infoComponent={balanceContent}
+                        buttons={[
+                            {link: "#", text: "Pay Now"},
+                            {link: "#", text: "History"}
+                        ]}
+            
+                    />
+                </div>
+                {maintenanceContent}
             </div>
         </div>
     )

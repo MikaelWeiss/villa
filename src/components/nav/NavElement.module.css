@@ -2,34 +2,26 @@
     background-color: transparent;
     width: 100%;
     margin: 0;
-    padding-block: 20px;
-    padding-inline: 10px;
     border-radius: 10px;
 }
 
-
-
-
-.inactiveLink {
+.navLink {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    gap: 1.5rem;
-    color: #bbb;
+    gap: 0.75rem;
+    color: #5a6c7d;
     text-decoration: none;
     font-weight: bold;
     font-size: 0.9rem;
+    padding: 20px;
+    border-radius: 15px;
 }
 
-.activeLink {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 1.5rem;
-    color: #bbb;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.9rem;
+.navLink:hover {
+    background-color: #f0f4f8;
+    color: #1976d2;
 }
+
+/*active bg color - #e3f2fd*/

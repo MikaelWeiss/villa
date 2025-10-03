@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../authentication';
 import SignInPage from '../pages/SignInPage';
 import DashboardPage from '../pages/DashboardPage';
+import TenantDashboard from "../pages/tenant/TenantDashboard";
+import TenantPayments from "../pages/tenant/TenantPayments";
+import TenantMaintenance from "../pages/tenant/TenantMaintenance";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -36,6 +39,30 @@ export default function AppRoutes() {
             </ProtectedRoute>
           } 
         />
+          <Route 
+          path="/tenantDashboard" 
+          element={
+            <ProtectedRoute>
+              <TenantDashboard />
+            </ProtectedRoute>
+          } 
+        />
+          <Route
+              path="/tenantPayments"
+              element={
+                  <ProtectedRoute>
+                      <TenantPayments />
+                  </ProtectedRoute>
+              }
+          />
+          <Route
+              path="/tenantMaintenance"
+              element={
+                  <ProtectedRoute>
+                      <TenantMaintenance />
+                  </ProtectedRoute>
+              }
+          />
       </Routes>
     </BrowserRouter>
   );

@@ -3,7 +3,7 @@ import styles from "./TenantPreviewCard.module.css";
 function TenantPreviewCard({ icon, infoComponent, buttons}) {
     return (
         <div className={styles.container}>
-            <img src={icon} alt="#" />
+            {icon}
             {infoComponent}
             <div className={styles.buttonContainer}>
                 {buttons.map((button) => (

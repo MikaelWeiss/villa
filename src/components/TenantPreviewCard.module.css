@@ -8,12 +8,14 @@
     padding-block: 30px;
     width: 100%;
     border-radius: 1rem;
-    border: 2px solid white;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 50px;
 }
 
 
 .container * {
-    color: white;
+    color: black;
 }
 
 .container p, .container a {

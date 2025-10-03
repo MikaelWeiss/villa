@@ -1,7 +1,0 @@
-.appLayout {
-    display: grid;
-    grid-template-columns: 3fr 10fr;
-    height: 100%;
-    background-color: black;
-}
-
