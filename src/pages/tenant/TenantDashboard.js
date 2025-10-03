@@ -5,10 +5,12 @@ import TenantMaintenanceList from "../../components/TenantMaintenanceList";
 import NewTicketModal from "../../components/NewTicketModal";
 import {useState} from "react";
 import { Wrench, House, CreditCard } from "lucide-react";
+import { useAuth } from '../../authentication';
 
 
 function TenantDashboard() {
     const [isOpen, setIsOpen] = useState(false);
+    const { signOutUser } = useAuth();
     const nav = 
         (<Nav navElements={[
             {
@@ -77,7 +79,12 @@ function TenantDashboard() {
             {nav}
             {isOpen && (<NewTicketModal setIsOpen={setIsOpen}/>)}
             <div className={styles.content}>
-                <h1 className={styles.title}>Dashboard</h1>
+                <div className={styles.header}>
+                    <h1 className={styles.title}>Dashboard</h1>
+                    <button className={styles.signOutBtn} onClick={signOutUser}>
+                        Sign Out
+                    </button>
+                </div>
                 <div className={styles.cardContainer}>
                     <TenantPreviewCard
                         icon=<CreditCard size={130} />
