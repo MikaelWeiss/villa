@@ -7,22 +7,37 @@ import TenantMaintenance from "../pages/tenant/TenantMaintenance";
 import ManagerDashboard from "../pages/manager/ManagerDashboard";
 
 function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
   return user ? children : <Navigate to="/signin" replace />;
 }
 
 function PublicRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  return user ? <Navigate to="/tenantDashboard" replace /> : children;
+  if (user) {
+    // Redirect based on user role
+    const redirectPath = userRole === 'manager' ? '/managerPage' : '/tenantDashboard';
+    return <Navigate to={redirectPath} replace />;
+  }
+  return children;
+}
+
+// Component to handle role-based routing from root path
+function RoleBasedRedirect() {
+  const { user, userRole, loading } = useAuth();
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to="/signin" replace />;
+  
+  const redirectPath = userRole === 'manager' ? '/managerPage' : '/tenantDashboard';
+  return <Navigate to={redirectPath} replace />;
 }
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/tenantDashboard" replace />} />
+        <Route path="/" element={<RoleBasedRedirect />} />
         <Route
           path="/signin"
           element={
