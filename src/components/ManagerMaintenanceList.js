@@ -1,12 +1,21 @@
+import { useNavigate } from 'react-router-dom';
 import styles from './ManagerMaintenanceList.module.css';
 
 function ManagerMaintenanceList({ tickets }) {
+    const navigate = useNavigate();
+
+    const handleTicketClick = (ticketId) => {
+        navigate(`/managerMaintenance/${ticketId}`);
+    };
+
     return (
         <div>
             <ul className={styles.ul}>
                 {tickets.map((ticket) => (
                     <li className={styles.li}
-                        key={ticket.id}>
+                        key={ticket.id}
+                        onClick={() => handleTicketClick(ticket.id)}
+                        style={{ cursor: 'pointer' }}>
                         <Ticket ticket={ticket} />
                     </li>
                 ))}
@@ -19,11 +28,11 @@ function ManagerMaintenanceList({ tickets }) {
             <div className={styles.ticketContainer}>
                 <div className={styles.ticketHeader}>
                     <h3>{ticket.title}</h3>
-                    <span className={styles.tenantInfo}>{ticket.tenantName} - {ticket.property}</span>
+                    <span className={styles.tenantInfo}>{ticket.tenantName} - {ticket.property || ticket.unit}</span>
                 </div>
                 <div className={styles.ticketInfo}>
                     <p>{ticket.date}</p>
-                    <p className={styles.severity}>{ticket.severity}</p>
+                    <p className={styles.severity}>{ticket.severity || 'medium'}</p>
                 </div>
                 <p>{ticket.description}</p>
             </div>
