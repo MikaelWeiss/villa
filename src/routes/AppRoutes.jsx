@@ -4,6 +4,8 @@ import SignInPage from '../pages/SignInPage';
 import TenantDashboard from "../pages/tenant/TenantDashboard";
 import TenantPayments from "../pages/tenant/TenantPayments";
 import TenantMaintenance from "../pages/tenant/TenantMaintenance";
+import ManagerMaintenanceDetail from "../pages/manager/ManagerMaintenanceDetail";
+import ManagerMaintenanceDetailMock from "../pages/manager/ManagerMaintenanceDetailMock";
 import ManagerDashboard from "../pages/manager/ManagerDashboard";
 
 function ProtectedRoute({ children }) {
@@ -62,6 +64,18 @@ export default function AppRoutes() {
                       <ManagerDashboard />
                   </ProtectedRoute>
               }
+          />
+          <Route
+              path="/manager/maintenance/:id"
+              element={
+                  <ProtectedRoute>
+                      <ManagerMaintenanceDetail />
+                  </ProtectedRoute>
+              }
+          />
+          <Route
+              path="/mock/manager/maintenance"
+              element={<ManagerMaintenanceDetailMock />}
           />
       </Routes>
     </BrowserRouter>
