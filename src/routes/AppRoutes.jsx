@@ -5,6 +5,7 @@ import DashboardPage from '../pages/DashboardPage';
 import TenantDashboard from "../pages/tenant/TenantDashboard";
 import TenantPayments from "../pages/tenant/TenantPayments";
 import TenantMaintenance from "../pages/tenant/TenantMaintenance";
+import ManagerDashboard from "../pages/manager/ManagerDashboard";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -60,6 +61,14 @@ export default function AppRoutes() {
               element={
                   <ProtectedRoute>
                       <TenantMaintenance />
+                  </ProtectedRoute>
+              }
+          />
+          <Route
+              path="/managerPage"
+              element={
+                  <ProtectedRoute>
+                      <ManagerDashboard />
                   </ProtectedRoute>
               }
           />
