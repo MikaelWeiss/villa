@@ -43,11 +43,25 @@ function ManagerMaintenanceDetail() {
     const fetchMaintenanceRequest = useCallback(async () => {
         try {
             setLoading(true);
-            const docRef = doc(db, 'maintenanceRequests', id);
+            const docRef = doc(db, 'reports', id);
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
-                setMaintenanceRequest({ id: docSnap.id, ...docSnap.data() });
+                const data = docSnap.data();
+                setMaintenanceRequest({
+                    id: docSnap.id,
+                    title: data.description?.substring(0, 50) + '...' || 'Maintenance Request',
+                    description: data.description || 'No description',
+                    date: data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    }) : 'Unknown date',
+                    severity: data.severity || 'medium',
+                    status: data.status || 'open',
+                    unitNumber: data.unit,
+                    updatedAt: data.updatedAt || data.createdAt?.toDate().toISOString()
+                });
             } else {
                 setError('Maintenance request not found');
             }
@@ -65,7 +79,7 @@ function ManagerMaintenanceDetail() {
 
     const handleStatusChange = async (newStatus) => {
         try {
-            const docRef = doc(db, 'maintenanceRequests', id);
+            const docRef = doc(db, 'reports', id);
             await updateDoc(docRef, {
                 status: newStatus,
                 updatedAt: new Date().toISOString()
