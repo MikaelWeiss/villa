@@ -118,6 +118,8 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: calc(100vw - 40px);
+    max-width: 800px;
 }
 
 #description-of-issue textarea {
