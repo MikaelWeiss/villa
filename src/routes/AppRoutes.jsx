@@ -8,6 +8,8 @@ import ManagerMaintenanceDetail from "../pages/manager/ManagerMaintenanceDetail"
 import ManagerMaintenanceDetailMock from "../pages/manager/ManagerMaintenanceDetailMock";
 import ManagerMaintenanceList from "../pages/manager/ManagerMaintenanceList";
 import ManagerDashboard from "../pages/manager/ManagerDashboard";
+import LandingPage from "../pages/LandingPage";
+import RequestQuote from "../pages/RequestQuote";
 
 function ProtectedRoute({ children }) {
   const { user, userRole, loading } = useAuth();
@@ -30,8 +32,7 @@ function PublicRoute({ children }) {
 function RoleBasedRedirect() {
   const { user, userRole, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/signin" replace />;
-  
+  if (!user) return <LandingPage />;
   const redirectPath = userRole === 'manager' ? '/managerPage' : '/tenantDashboard';
   return <Navigate to={redirectPath} replace />;
 }
@@ -41,6 +42,7 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<RoleBasedRedirect />} />
+        <Route path="/quote" element={<PublicRoute><RequestQuote /></PublicRoute>} />
         <Route
           path="/signin"
           element={
