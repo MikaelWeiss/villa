@@ -6,7 +6,7 @@ function Nav({ navElements }) {
         <nav className={styles.nav}>
             <ul className={styles.elementsList}>
                 {navElements.map((element) => (
-                    <NavElement elementInfo={element} />
+                    <NavElement key={element.id} elementInfo={element} />
                 ))}
             </ul>
         </nav>

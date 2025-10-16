@@ -4,6 +4,9 @@ import SignInPage from '../pages/SignInPage';
 import TenantDashboard from "../pages/tenant/TenantDashboard";
 import TenantPayments from "../pages/tenant/TenantPayments";
 import TenantMaintenance from "../pages/tenant/TenantMaintenance";
+import ManagerMaintenanceDetail from "../pages/manager/ManagerMaintenanceDetail";
+import ManagerMaintenanceDetailMock from "../pages/manager/ManagerMaintenanceDetailMock";
+import ManagerMaintenanceList from "../pages/manager/ManagerMaintenanceList";
 import ManagerDashboard from "../pages/manager/ManagerDashboard";
 import LandingPage from "../pages/LandingPage";
 import RequestQuote from "../pages/RequestQuote";
@@ -73,12 +76,32 @@ export default function AppRoutes() {
               }
           />
           <Route
+              path="/managerMaintenance"
+              element={
+                  <ProtectedRoute>
+                      <ManagerMaintenanceList />
+                  </ProtectedRoute>
+              }
+          />
+          <Route
               path="/managerPage"
               element={
                   <ProtectedRoute>
                       <ManagerDashboard />
                   </ProtectedRoute>
               }
+          />
+          <Route
+              path="/manager/maintenance/:id"
+              element={
+                  <ProtectedRoute>
+                      <ManagerMaintenanceDetail />
+                  </ProtectedRoute>
+              }
+          />
+          <Route
+              path="/mock/manager/maintenance"
+              element={<ManagerMaintenanceDetailMock />}
           />
       </Routes>
     </BrowserRouter>

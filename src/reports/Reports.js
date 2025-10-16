@@ -15,7 +15,7 @@ export default function Reports() {
     if (!user) return;
     const q = query(
       collection(db, 'reports'),
-      where('tenantUid', '==', user.uid),
+      where('tenantID', '==', user.uid),
       orderBy('createdAt', 'desc')
     );
     const unsub = onSnapshot(q, (snap) => {
@@ -30,7 +30,7 @@ export default function Reports() {
     setSubmitting(true);
     try {
       await addDoc(collection(db, 'reports'), {
-        tenantUid: user.uid,
+        tenantID: user.uid,
         tenantName: user.displayName || user.email,
         unit,
         description,
