@@ -4,31 +4,31 @@ import styles from "./TenantDashboard.module.css";
 import TenantMaintenanceList from "../../components/TenantMaintenanceList";
 import NewTicketModal from "../../components/NewTicketModal";
 import {useState} from "react";
-// Icon placeholders replaced with simple emoji to remove external dependency
 import { useAuth } from '../../authentication';
+import { Wrench, House, CreditCard } from "lucide-react";
 
 
 function TenantDashboard() {
     const [isOpen, setIsOpen] = useState(false);
     const { signOutUser } = useAuth();
-    const nav = 
+    const nav =
         (<Nav navElements={[
             {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="home">🏠</span>,
+                icon: <House size={20} />,
                 path: "/tenantDashboard",
             },
             {
                 name: "Payments",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="card">💳</span>,
+                icon: <CreditCard size={20} />,
                 path: "/tenantPayments",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="wrench">🔧</span>,
+                icon: <Wrench size={20} />,
                 path: "/tenantMaintenance"
             }
         ]}
@@ -87,7 +87,7 @@ function TenantDashboard() {
                 </div>
                 <div className={styles.cardContainer}>
                     <TenantPreviewCard
-                        icon={<span style={{fontSize: 100}} role="img" aria-label="card">💳</span>}
+                        icon={<CreditCard size={130} />}
                         infoComponent={balanceContent}
                         buttons={[
                             {link: "#", text: "Pay Now"},
