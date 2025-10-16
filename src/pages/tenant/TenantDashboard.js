@@ -4,7 +4,7 @@ import styles from "./TenantDashboard.module.css";
 import TenantMaintenanceList from "../../components/TenantMaintenanceList";
 import NewTicketModal from "../../components/NewTicketModal";
 import {useState} from "react";
-import { Wrench, House, CreditCard } from "lucide-react";
+// Icon placeholders replaced with simple emoji to remove external dependency
 import { useAuth } from '../../authentication';
 
 
@@ -16,19 +16,19 @@ function TenantDashboard() {
             {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
-                icon: <House size={20} />,
+                icon: <span role="img" aria-label="home">🏠</span>,
                 path: "/tenantDashboard",
             },
             {
                 name: "Payments",
                 id: crypto.randomUUID(),
-                icon: <CreditCard size={20} />,
+                icon: <span role="img" aria-label="card">💳</span>,
                 path: "/tenantPayments",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
-                icon: <Wrench size={20} />,
+                icon: <span role="img" aria-label="wrench">🔧</span>,
                 path: "/tenantMaintenance"
             }
         ]}
@@ -87,7 +87,7 @@ function TenantDashboard() {
                 </div>
                 <div className={styles.cardContainer}>
                     <TenantPreviewCard
-                        icon=<CreditCard size={130} />
+                        icon={<span style={{fontSize: 100}} role="img" aria-label="card">💳</span>}
                         infoComponent={balanceContent}
                         buttons={[
                             {link: "#", text: "Pay Now"},
