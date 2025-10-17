@@ -36,14 +36,42 @@ export default function Reports() {
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
           table: 'reports',
           filter: `tenant_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('Report change received:', payload);
-          fetchReports(); // Refetch to ensure correct order
+          console.log('Report inserted:', payload.new);
+          setItems(prev => [payload.new, ...prev]);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'reports',
+          filter: `tenant_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Report updated:', payload.new);
+          setItems(prev => prev.map(item =>
+            item.id === payload.new.id ? payload.new : item
+          ));
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'reports',
+          filter: `tenant_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Report deleted:', payload.old);
+          setItems(prev => prev.filter(item => item.id !== payload.old.id));
         }
       )
       .subscribe();

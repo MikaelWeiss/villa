@@ -9,28 +9,18 @@ const AuthContext = React.createContext({
   signOutUser: async () => {},
 });
 
-// Function to check if user is a manager
-const checkUserRole = async (supabaseUser) => {
+// Function to get user role from JWT claims
+const getUserRole = (supabaseUser) => {
   if (!supabaseUser) {
     return null;
   }
 
-  try {
-    // Use the is_manager RPC function to check if user is a manager
-    const { data, error } = await supabase.rpc('is_manager', {
-      user_email: supabaseUser.email
-    });
+  // Read role from JWT custom claims (set by custom_access_token_hook)
+  // This is instant and requires no database call
+  const role = supabaseUser.user_metadata?.user_role;
 
-    if (error) {
-      console.error('Error checking user role:', error);
-      return 'tenant'; // Default to tenant if there's an error
-    }
-
-    return data ? 'manager' : 'tenant';
-  } catch (error) {
-    console.error('Error checking user role:', error);
-    return 'tenant'; // Default to tenant if there's an error
-  }
+  // Fallback to 'tenant' if role not found
+  return role || 'tenant';
 };
 
 export function AuthProvider({ children }) {
@@ -43,18 +33,20 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
-        checkUserRole(session.user).then(setUserRole);
+        const role = getUserRole(session.user);
+        setUserRole(role);
+        console.log('User role determined:', role);
       }
       setLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', session?.user ? 'User signed in' : 'User signed out');
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        const role = await checkUserRole(session.user);
+        const role = getUserRole(session.user);
         setUserRole(role);
         console.log('User role determined:', role);
       } else {

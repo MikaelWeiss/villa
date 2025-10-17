@@ -73,19 +73,64 @@ function ManagerMaintenanceListPage() {
 
         fetchReports();
 
+        // Helper function to transform report to ticket format
+        const transformReportToTicket = (report) => ({
+            id: report.id,
+            title: report.description?.substring(0, 50) + '...' || 'No title',
+            date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }) : 'Unknown date',
+            severity: report.severity || 'medium',
+            description: report.description || 'No description',
+            tenantName: report.tenant_name || 'Unknown tenant',
+            property: report.unit || 'Unknown unit',
+            unit: report.unit,
+            status: report.status || 'open'
+        });
+
         // Set up real-time subscription
         const channel = supabase
             .channel('all-reports-changes')
             .on(
                 'postgres_changes',
                 {
-                    event: '*',
+                    event: 'INSERT',
                     schema: 'public',
                     table: 'reports'
                 },
                 (payload) => {
-                    console.log('Report change received:', payload);
-                    fetchReports(); // Refetch to ensure correct order
+                    console.log('Report inserted:', payload.new);
+                    const newTicket = transformReportToTicket(payload.new);
+                    setTickets(prev => [newTicket, ...prev]);
+                }
+            )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'reports'
+                },
+                (payload) => {
+                    console.log('Report updated:', payload.new);
+                    const updatedTicket = transformReportToTicket(payload.new);
+                    setTickets(prev => prev.map(ticket =>
+                        ticket.id === updatedTicket.id ? updatedTicket : ticket
+                    ));
+                }
+            )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'reports'
+                },
+                (payload) => {
+                    console.log('Report deleted:', payload.old);
+                    setTickets(prev => prev.filter(ticket => ticket.id !== payload.old.id));
                 }
             )
             .subscribe();

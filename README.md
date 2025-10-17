@@ -73,61 +73,146 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
-## Firebase + Auth + Firestore Setup (Vill)
+## Supabase Setup
 
-1) Create Firebase project and web app
-- Go to the Firebase console and create a project.
-- Add a Web app; copy the config keys.
-- Create a `.env.local` file in the project root with:
+### Prerequisites
+- A Supabase account and project
+- Node.js and npm installed
 
-```
-REACT_APP_FIREBASE_API_KEY=your_key
-REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=your_project_id
-REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=xxxxxx
-REACT_APP_FIREBASE_APP_ID=1:xxxx:web:xxxx
-```
+### 1. Environment Configuration
 
-2) Enable Authentication
-- In Firebase console -> Authentication -> Sign-in method -> enable Google.
-
-3) Enable Firestore
-- Create a Cloud Firestore database in Production mode.
-- Suggested security rules for basic tenant-only access to their own reports (adjust to your needs):
+Create a `.env` file in the project root with your Supabase credentials:
 
 ```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /reports/{reportId} {
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.tenantUid;
-      allow create: if request.auth != null && request.resource.data.tenantUid == request.auth.uid;
-    }
-  }
-}
+REACT_APP_SUPABASE_URL=your_project_url
+REACT_APP_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-4) Run locally
-- `npm start`
+Get these values from:
+1. Go to your Supabase project dashboard
+2. Navigate to Settings > API
+3. Copy the Project URL and anon/public key
 
-App structure for auth and data:
-- `src/firebase.js`: initializes Firebase (Auth, Firestore) from env vars.
-- `src/AuthContext.js`: provides user state, Google sign-in, and sign out.
-- `src/App.js`: routes between Sign-in and Dashboard.
-- `src/Reports.js`: create and list reports for the signed-in user.
+### 2. Database Schema
+
+This app uses the following tables:
+
+**reports** - Maintenance/damage reports
+- `id` (uuid, primary key)
+- `tenant_id` (uuid, foreign key to auth.users)
+- `tenant_name` (text)
+- `unit` (text)
+- `description` (text)
+- `status` (text) - 'open', 'in-progress', or 'resolved'
+- `created_at` (timestamp)
+- `updated_at` (timestamp)
+
+**managers** - Manager role assignments
+- `id` (uuid, primary key)
+- `email` (text, unique)
+- `created_at` (timestamp)
+
+**quotes** - Lead generation from website
+- `id` (uuid, primary key)
+- `name` (text)
+- `email` (text)
+- `phone` (text)
+- `portfolio_size` (text)
+- `message` (text)
+- `status` (text)
+- `source` (text)
+- `created_at` (timestamp)
+
+### 3. RPC Functions
+
+Create the `is_manager` function in your Supabase SQL Editor:
+
+```sql
+CREATE OR REPLACE FUNCTION is_manager(user_email TEXT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM managers WHERE email = user_email
+  );
+END;
+$$;
+```
+
+### 4. Row Level Security (RLS)
+
+Enable RLS on your tables and add appropriate policies:
+
+**reports table:**
+```sql
+-- Tenants can read their own reports
+CREATE POLICY "Tenants can view own reports"
+  ON reports FOR SELECT
+  USING (auth.uid() = tenant_id);
+
+-- Tenants can insert their own reports
+CREATE POLICY "Tenants can create own reports"
+  ON reports FOR INSERT
+  WITH CHECK (auth.uid() = tenant_id);
+
+-- Managers can view all reports
+CREATE POLICY "Managers can view all reports"
+  ON reports FOR SELECT
+  USING (is_manager((SELECT email FROM auth.users WHERE id = auth.uid())));
+
+-- Managers can update all reports
+CREATE POLICY "Managers can update all reports"
+  ON reports FOR UPDATE
+  USING (is_manager((SELECT email FROM auth.users WHERE id = auth.uid())));
+```
+
+### 5. Authentication
+
+Enable Google OAuth in Supabase:
+1. Go to Authentication > Providers in your Supabase dashboard
+2. Enable Google provider
+3. Configure your Google OAuth credentials
+4. Add authorized redirect URLs
+
+### 6. Running Locally
+
+```bash
+npm install
+npm start
+```
+
+The app will open at [http://localhost:3000](http://localhost:3000)
+
+### 7. Application Structure
+
+- `src/authentication/supabase.js` - Supabase client initialization
+- `src/authentication/index.js` - Auth context provider with Google OAuth
+- `src/reports/Reports.js` - Tenant dashboard for damage reports
+- `src/pages/manager/` - Manager dashboard pages
+- `src/utils/managerUtils.js` - Manager role management utilities
+
+### 8. Enable Custom Access Token Hook
+
+To enable role-based authentication via JWT claims:
+
+1. Go to your Supabase project dashboard
+2. Navigate to **Authentication > Hooks**
+3. Enable the **"Custom Access Token"** hook
+4. Select the function: `custom_access_token_hook`
+5. Save changes
+
+This eliminates an extra database call on every auth state change by embedding the user role directly in the JWT token.
 
 ## Deploying to Fly.io
 
-This is a React single-page app. Common approaches on Fly.io:
-- Build a container that runs a static file server (e.g., `serve`) for the production build.
-- Or use Fly Machines/Apps to serve the `build/` directory.
+This is a React single-page app served as static files.
 
-Minimal steps:
-1) Add a Dockerfile that builds and serves CRA:
+### Dockerfile
 
-```
-# Use node to build
+```dockerfile
+# Build stage
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
@@ -135,25 +220,24 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Serve static files
+# Production stage - serve static files
 FROM pierrezemb/gostatic
 COPY --from=build /app/build /srv/http
 ```
 
-2) Create `fly.toml` with static port 80 exposure, then:
-- `flyctl launch` (choose yes to set up, no to deploy if you still need to set env)
-- Set environment variables in Fly secrets (they become runtime env for the build only if you build on Fly; for static serve, env is not required at runtime):
+### Deploy Steps
 
+1. Create `fly.toml` with static port 80 exposure
+2. Launch the app:
+```bash
+flyctl launch
 ```
+
+3. Set environment variables:
+```bash
 flyctl secrets set \
-  REACT_APP_FIREBASE_API_KEY=xxx \
-  REACT_APP_FIREBASE_AUTH_DOMAIN=xxx \
-  REACT_APP_FIREBASE_PROJECT_ID=xxx \
-  REACT_APP_FIREBASE_STORAGE_BUCKET=xxx \
-  REACT_APP_FIREBASE_MESSAGING_SENDER_ID=xxx \
-  REACT_APP_FIREBASE_APP_ID=xxx
+  REACT_APP_SUPABASE_URL=your_project_url \
+  REACT_APP_SUPABASE_ANON_KEY=your_anon_key
 ```
 
-Notes:
-- CRA reads `REACT_APP_*` at build time. When building inside Fly, set secrets before the build. If you build locally, ensure `.env.production` or your local env has the keys before `npm run build`, and deploy the built files.
-- If you need role-based manager access later, add custom claims via Firebase Admin (requires a backend) or store roles in Firestore with rule checks.
+**Note**: CRA reads `REACT_APP_*` at build time. If building locally, ensure your `.env.production` has the correct values before running `npm run build`.

@@ -2,9 +2,24 @@
 import { supabase } from '../authentication';
 
 /**
+ * IMPORTANT: These functions are intended for administrative use only.
+ *
+ * The managers table has Row Level Security (RLS) policies that prevent
+ * regular users from modifying manager records. These functions will fail
+ * unless called with proper administrative credentials.
+ *
+ * For production use, manage roles via:
+ * 1. Supabase Dashboard > Table Editor > managers table
+ * 2. Supabase SQL Editor with appropriate admin credentials
+ * 3. Backend service with service role key (never exposed to client)
+ *
+ * These client-side functions are provided for convenience during development
+ * but should NOT be relied upon in production environments.
+ */
+
+/**
  * Add a manager to the managers collection
- * NOTE: This requires admin privileges. The managers table has RLS policies that
- * prevent regular users from inserting. Use the Supabase Dashboard or admin API.
+ * NOTE: This requires admin privileges due to RLS policies.
  * @param {string} email - The manager's email address
  * @param {object} additionalData - Additional data to store with the manager
  * @returns {Promise<boolean>} - Success status
@@ -33,8 +48,7 @@ export const addManager = async (email, additionalData = {}) => {
 
 /**
  * Remove a manager from the managers collection
- * NOTE: This requires admin privileges. The managers table has RLS policies that
- * prevent regular users from deleting. Use the Supabase Dashboard or admin API.
+ * NOTE: This requires admin privileges due to RLS policies.
  * @param {string} email - The manager's email address
  * @returns {Promise<boolean>} - Success status
  */
