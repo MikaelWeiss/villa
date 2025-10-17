@@ -5,7 +5,7 @@ const AuthContext = React.createContext({
   user: null,
   userRole: null,
   loading: true,
-  signInWithGoogle: async () => {},
+  signInWithMagicLink: async () => {},
   signOutUser: async () => {},
 });
 
@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
         setUser(session.user);
         const role = getUserRole(session.user);
         setUserRole(role);
-        console.log('User role determined:', role);
+        console.log('User role from JWT:', role);
       }
       setLoading(false);
     });
@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
       if (session?.user) {
         const role = getUserRole(session.user);
         setUserRole(role);
-        console.log('User role determined:', role);
+        console.log('User role from JWT:', role);
       } else {
         setUserRole(null);
       }
@@ -61,16 +61,16 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const signInWithGoogle = React.useCallback(async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+  const signInWithMagicLink = React.useCallback(async (email) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email,
       options: {
-        redirectTo: window.location.origin,
+        emailRedirectTo: window.location.origin,
       }
     });
 
     if (error) {
-      console.error('Error signing in with Google:', error);
+      console.error('Error sending magic link:', error);
       throw error;
     }
   }, []);
@@ -83,7 +83,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const value = React.useMemo(() => ({ user, userRole, loading, signInWithGoogle, signOutUser }), [user, userRole, loading, signInWithGoogle, signOutUser]);
+  const value = React.useMemo(() => ({ user, userRole, loading, signInWithMagicLink, signOutUser }), [user, userRole, loading, signInWithMagicLink, signOutUser]);
 
   return (
     <AuthContext.Provider value={value}>

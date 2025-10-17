@@ -170,11 +170,14 @@ CREATE POLICY "Managers can update all reports"
 
 ### 5. Authentication
 
-Enable Google OAuth in Supabase:
-1. Go to Authentication > Providers in your Supabase dashboard
-2. Enable Google provider
-3. Configure your Google OAuth credentials
-4. Add authorized redirect URLs
+The app uses magic link authentication (passwordless email login).
+
+To configure email settings in Supabase:
+1. Go to Authentication > Email Templates in your Supabase dashboard
+2. Customize the magic link email template if desired
+3. Configure your email provider (SMTP) in Authentication > Settings if needed
+
+Magic link authentication is enabled by default in Supabase and requires no additional setup.
 
 ### 6. Running Locally
 
@@ -188,22 +191,12 @@ The app will open at [http://localhost:3000](http://localhost:3000)
 ### 7. Application Structure
 
 - `src/authentication/supabase.js` - Supabase client initialization
-- `src/authentication/index.js` - Auth context provider with Google OAuth
+- `src/authentication/index.js` - Auth context provider with magic link authentication
+- `src/pages/SignInPage.jsx` - Email-based magic link sign-in page
 - `src/reports/Reports.js` - Tenant dashboard for damage reports
 - `src/pages/manager/` - Manager dashboard pages
 - `src/utils/managerUtils.js` - Manager role management utilities
 
-### 8. Enable Custom Access Token Hook
-
-To enable role-based authentication via JWT claims:
-
-1. Go to your Supabase project dashboard
-2. Navigate to **Authentication > Hooks**
-3. Enable the **"Custom Access Token"** hook
-4. Select the function: `custom_access_token_hook`
-5. Save changes
-
-This eliminates an extra database call on every auth state change by embedding the user role directly in the JWT token.
 
 ## Deploying to Fly.io
 
