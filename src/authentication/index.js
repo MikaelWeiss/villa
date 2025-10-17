@@ -9,18 +9,41 @@ const AuthContext = React.createContext({
   signOutUser: async () => {},
 });
 
-// Function to get user role from JWT claims
-const getUserRole = (supabaseUser) => {
+// Function to check if user is a manager by querying the managers table directly
+const checkUserRole = async (supabaseUser) => {
   if (!supabaseUser) {
     return null;
   }
 
-  // Read role from JWT custom claims (set by custom_access_token_hook)
-  // This is instant and requires no database call
-  const role = supabaseUser.user_metadata?.user_role;
+  try {
+    console.log('Checking role for user:', supabaseUser.email);
 
-  // Fallback to 'tenant' if role not found
-  return role || 'tenant';
+    // Add a timeout to prevent hanging forever
+    const queryPromise = supabase
+      .from('managers')
+      .select('email')
+      .eq('email', supabaseUser.email)
+      .maybeSingle();
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Query timeout')), 5000)
+    );
+
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+
+    if (error) {
+      console.error('Error checking user role:', error);
+      return 'tenant';
+    }
+
+    const role = data ? 'manager' : 'tenant';
+    console.log('User role determined:', role);
+    return role;
+  } catch (error) {
+    console.error('Error or timeout checking user role:', error);
+    // Default to tenant if query fails
+    return 'tenant';
+  }
 };
 
 export function AuthProvider({ children }) {
@@ -29,34 +52,67 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    let mounted = true;
+    let isProcessing = false;
+
+    const processSession = async (session, source) => {
+      if (!mounted || isProcessing) return;
+      isProcessing = true;
+
+      console.log('Processing session from:', source);
+
       if (session?.user) {
         setUser(session.user);
-        const role = getUserRole(session.user);
-        setUserRole(role);
-        console.log('User role from JWT:', role);
-      }
-      setLoading(false);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', session?.user ? 'User signed in' : 'User signed out');
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        const role = getUserRole(session.user);
-        setUserRole(role);
-        console.log('User role from JWT:', role);
+        const role = await checkUserRole(session.user);
+        if (mounted) {
+          setUserRole(role);
+          console.log('User role:', role);
+        }
       } else {
+        setUser(null);
         setUserRole(null);
       }
 
-      setLoading(false);
+      if (mounted) {
+        setLoading(false);
+      }
+
+      isProcessing = false;
+    };
+
+    // Check current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      // Only process if we have a session, otherwise let onAuthStateChange handle it
+      if (session) {
+        processSession(session, 'getSession');
+      } else {
+        setLoading(false);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
+      console.log('Auth event:', event, session?.user ? 'User signed in' : 'User signed out');
+
+      // Process INITIAL_SESSION (most reliable for magic links) and SIGNED_OUT
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_OUT') {
+        await processSession(session, event);
+      }
+      // For SIGNED_IN, only process if we don't already have a user (avoid duplicate)
+      else if (event === 'SIGNED_IN' && !isProcessing) {
+        await processSession(session, event);
+      }
+      // Ignore other events like TOKEN_REFRESHED
+      else {
+        console.log('Ignoring auth event:', event);
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
