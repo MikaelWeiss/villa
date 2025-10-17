@@ -1,9 +1,10 @@
 // Utility functions for managing manager roles
-import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
-import { db } from '../authentication/firebase';
+import { supabase } from '../authentication';
 
 /**
  * Add a manager to the managers collection
+ * NOTE: This requires admin privileges. The managers table has RLS policies that
+ * prevent regular users from inserting. Use the Supabase Dashboard or admin API.
  * @param {string} email - The manager's email address
  * @param {object} additionalData - Additional data to store with the manager
  * @returns {Promise<boolean>} - Success status
@@ -13,10 +14,15 @@ export const addManager = async (email, additionalData = {}) => {
     const managerData = {
       email,
       ...additionalData,
-      createdAt: new Date().toISOString()
+      created_at: new Date().toISOString()
     };
-    
-    await setDoc(doc(db, 'managers', email), managerData);
+
+    const { error } = await supabase
+      .from('managers')
+      .insert(managerData);
+
+    if (error) throw error;
+
     console.log(`Manager ${email} added successfully`);
     return true;
   } catch (error) {
@@ -27,12 +33,20 @@ export const addManager = async (email, additionalData = {}) => {
 
 /**
  * Remove a manager from the managers collection
+ * NOTE: This requires admin privileges. The managers table has RLS policies that
+ * prevent regular users from deleting. Use the Supabase Dashboard or admin API.
  * @param {string} email - The manager's email address
  * @returns {Promise<boolean>} - Success status
  */
 export const removeManager = async (email) => {
   try {
-    await deleteDoc(doc(db, 'managers', email));
+    const { error } = await supabase
+      .from('managers')
+      .delete()
+      .eq('email', email);
+
+    if (error) throw error;
+
     console.log(`Manager ${email} removed successfully`);
     return true;
   } catch (error) {
@@ -48,8 +62,12 @@ export const removeManager = async (email) => {
  */
 export const isManager = async (email) => {
   try {
-    const managerDoc = await getDoc(doc(db, 'managers', email));
-    return managerDoc.exists();
+    const { data, error } = await supabase.rpc('is_manager', {
+      user_email: email
+    });
+
+    if (error) throw error;
+    return data || false;
   } catch (error) {
     console.error('Error checking manager status:', error);
     return false;
@@ -63,11 +81,14 @@ export const isManager = async (email) => {
  */
 export const getManagerInfo = async (email) => {
   try {
-    const managerDoc = await getDoc(doc(db, 'managers', email));
-    if (managerDoc.exists()) {
-      return { id: managerDoc.id, ...managerDoc.data() };
-    }
-    return null;
+    const { data, error } = await supabase
+      .from('managers')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error('Error getting manager info:', error);
     return null;

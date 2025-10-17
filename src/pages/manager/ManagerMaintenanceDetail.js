@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../authentication/firebase';
+import { supabase } from '../../authentication';
 import { useAuth } from '../../authentication';
 import Nav from '../../components/nav/Nav';
 import StatusSelector from '../../components/StatusSelector';
@@ -43,16 +42,20 @@ function ManagerMaintenanceDetail() {
     const fetchMaintenanceRequest = useCallback(async () => {
         try {
             setLoading(true);
-            const docRef = doc(db, 'reports', id);
-            const docSnap = await getDoc(docRef);
+            const { data, error: fetchError } = await supabase
+                .from('reports')
+                .select('*')
+                .eq('id', id)
+                .single();
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
+            if (fetchError) throw fetchError;
+
+            if (data) {
                 setMaintenanceRequest({
-                    id: docSnap.id,
+                    id: data.id,
                     title: data.description?.substring(0, 50) + '...' || 'Maintenance Request',
                     description: data.description || 'No description',
-                    date: data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString('en-US', {
+                    date: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
@@ -60,7 +63,7 @@ function ManagerMaintenanceDetail() {
                     severity: data.severity || 'medium',
                     status: data.status || 'open',
                     unitNumber: data.unit,
-                    updatedAt: data.updatedAt || data.createdAt?.toDate().toISOString()
+                    updatedAt: data.updated_at || data.created_at
                 });
             } else {
                 setError('Maintenance request not found');
@@ -79,11 +82,15 @@ function ManagerMaintenanceDetail() {
 
     const handleStatusChange = async (newStatus) => {
         try {
-            const docRef = doc(db, 'reports', id);
-            await updateDoc(docRef, {
-                status: newStatus,
-                updatedAt: new Date().toISOString()
-            });
+            const { error: updateError } = await supabase
+                .from('reports')
+                .update({
+                    status: newStatus,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id);
+
+            if (updateError) throw updateError;
 
             setMaintenanceRequest(prev => ({
                 ...prev,

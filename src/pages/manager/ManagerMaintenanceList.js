@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '../../authentication/firebase';
+import { supabase } from '../../authentication';
 import Nav from '../../components/nav/Nav.js';
 import styles from "./ManagerMaintenanceList.module.css";
 import ManagerMaintenanceList from "../../components/ManagerMaintenanceList";
@@ -37,42 +36,63 @@ function ManagerMaintenanceListPage() {
         />)
 
     useEffect(() => {
-        const q = query(
-            collection(db, 'reports'),
-            orderBy('createdAt', 'desc')
-        );
+        // Initial fetch
+        const fetchReports = async () => {
+            try {
+                const { data, error: fetchError } = await supabase
+                    .from('reports')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-        const unsubscribe = onSnapshot(q,
-            (snapshot) => {
-                const fetchedTickets = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    return {
-                        id: doc.id,
-                        title: data.description?.substring(0, 50) + '...' || 'No title',
-                        date: data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                        }) : 'Unknown date',
-                        severity: data.severity || 'medium',
-                        description: data.description || 'No description',
-                        tenantName: data.tenantName || 'Unknown tenant',
-                        property: data.unit || 'Unknown unit',
-                        unit: data.unit,
-                        status: data.status || 'open'
-                    };
-                });
+                if (fetchError) throw fetchError;
+
+                const fetchedTickets = data.map(report => ({
+                    id: report.id,
+                    title: report.description?.substring(0, 50) + '...' || 'No title',
+                    date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    }) : 'Unknown date',
+                    severity: report.severity || 'medium',
+                    description: report.description || 'No description',
+                    tenantName: report.tenant_name || 'Unknown tenant',
+                    property: report.unit || 'Unknown unit',
+                    unit: report.unit,
+                    status: report.status || 'open'
+                }));
+
                 setTickets(fetchedTickets);
                 setLoading(false);
-            },
-            (err) => {
+            } catch (err) {
                 console.error('Error fetching maintenance requests:', err);
                 setError('Failed to load maintenance requests');
                 setLoading(false);
             }
-        );
+        };
 
-        return () => unsubscribe();
+        fetchReports();
+
+        // Set up real-time subscription
+        const channel = supabase
+            .channel('all-reports-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'reports'
+                },
+                (payload) => {
+                    console.log('Report change received:', payload);
+                    fetchReports(); // Refetch to ensure correct order
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [])
 
     if (loading) {

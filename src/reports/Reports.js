@@ -1,6 +1,5 @@
 import React from 'react';
-import { collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy } from 'firebase/firestore';
-import { useAuth, db } from '../authentication';
+import { useAuth, supabase } from '../authentication';
 import './Reports.css';
 
 export default function Reports() {
@@ -13,15 +12,45 @@ export default function Reports() {
 
   React.useEffect(() => {
     if (!user) return;
-    const q = query(
-      collection(db, 'reports'),
-      where('tenantID', '==', user.uid),
-      orderBy('createdAt', 'desc')
-    );
-    const unsub = onSnapshot(q, (snap) => {
-      setItems(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
-    return () => unsub();
+
+    // Initial fetch
+    const fetchReports = async () => {
+      const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('tenant_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching reports:', error);
+      } else {
+        setItems(data || []);
+      }
+    };
+
+    fetchReports();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('reports-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reports',
+          filter: `tenant_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Report change received:', payload);
+          fetchReports(); // Refetch to ensure correct order
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const handleSubmit = async (e) => {
@@ -29,14 +58,21 @@ export default function Reports() {
     if (!description || !unit) return;
     setSubmitting(true);
     try {
-      await addDoc(collection(db, 'reports'), {
-        tenantID: user.uid,
-        tenantName: user.displayName || user.email,
-        unit,
-        description,
-        status: 'open',
-        createdAt: serverTimestamp(),
-      });
+      const { error } = await supabase
+        .from('reports')
+        .insert({
+          tenant_id: user.id,
+          tenant_name: user.user_metadata?.full_name || user.email,
+          unit,
+          description,
+          status: 'open',
+        });
+
+      if (error) {
+        console.error('Error creating report:', error);
+        throw error;
+      }
+
       setDescription('');
       setUnit('');
       setShowAddForm(false);
@@ -47,7 +83,7 @@ export default function Reports() {
 
   const formatDate = (timestamp) => {
     if (!timestamp) return 'Unknown date';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const date = new Date(timestamp);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -207,7 +243,7 @@ export default function Reports() {
               <div className="report-description">{report.description}</div>
               <div className="report-footer">
                 <div className="report-date">
-                  Created: {formatDate(report.createdAt)}
+                  Created: {formatDate(report.created_at)}
                 </div>
                 <div className="report-actions">
                   <button className="action-btn">View Details</button>
