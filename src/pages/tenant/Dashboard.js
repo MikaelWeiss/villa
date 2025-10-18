@@ -1,12 +1,14 @@
 import Nav from '../../components/nav/Nav.js';
 import TenantPreviewCard from "../../components/TenantPreviewCard";
-import styles from "./Dashboard.module.css";
 import TenantMaintenanceList from "../../components/TenantMaintenanceList";
 import NewTicketModal from "../../components/NewTicketModal";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Wrench, House, CreditCard } from "lucide-react";
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import PageHeader from '../../components/ui/PageHeader';
 
 function TenantDashboard() {
     const [isOpen, setIsOpen] = useState(false);
@@ -61,9 +63,9 @@ function TenantDashboard() {
         />)
 
     const balanceContent = (
-        <div className={styles.textContainer}>
-            <h3>Balance</h3>
-            <p>$0.00</p>
+        <div className="flex flex-col gap-1">
+            <h3 className="text-lg font-semibold text-secondary-700">Balance</h3>
+            <p className="text-3xl font-bold text-success">$0.00</p>
         </div>
     )
 
@@ -78,36 +80,39 @@ function TenantDashboard() {
     }));
 
     const maintenanceContent = (
-        <div className={styles.maintenanceContainer}>
-            <div className={styles.maintenanceHeader}>
-                <h2>Maintenance Requests</h2>
-                <button
-                    className={styles.button}
-                    onClick={() => setIsOpen(true)}>
-                    New Request
-                </button>
-            </div>
-            <hr />
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                <TenantMaintenanceList tickets={formattedTickets} />
-            )}
-        </div>
+        <Card>
+            <Card.Header>
+                <div className="flex items-center justify-between">
+                    <Card.Title>Maintenance Requests</Card.Title>
+                    <Button onClick={() => setIsOpen(true)}>
+                        New Request
+                    </Button>
+                </div>
+            </Card.Header>
+            <Card.Content>
+                {loading ? (
+                    <p className="text-secondary-500">Loading...</p>
+                ) : (
+                    <TenantMaintenanceList tickets={formattedTickets} />
+                )}
+            </Card.Content>
+        </Card>
     )
 
     return (
-        <div className={styles.container}>
+        <div className="flex">
             {nav}
             {isOpen && (<NewTicketModal setIsOpen={setIsOpen} onReportCreated={fetchReports} />)}
-            <div className={styles.content}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Dashboard</h1>
-                    <button className={styles.signOutBtn} onClick={signOut}>
-                        Sign Out
-                    </button>
-                </div>
-                <div className={styles.cardContainer}>
+            <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                <PageHeader
+                    title="Dashboard"
+                    actions={
+                        <Button variant="danger" onClick={signOut}>
+                            Sign Out
+                        </Button>
+                    }
+                />
+                <div className="mb-8">
                     <TenantPreviewCard
                         icon={<CreditCard size={130} />}
                         infoComponent={balanceContent}

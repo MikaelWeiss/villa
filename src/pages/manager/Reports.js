@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
-import styles from "./Reports.module.css";
 import ManagerMaintenanceList from "../../components/ManagerMaintenanceList";
 import { Wrench, LayoutDashboard, Users } from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/ui/Button';
+import PageHeader from '../../components/ui/PageHeader';
+import EmptyState from '../../components/ui/EmptyState';
 
 function ManagerMaintenanceListPage() {
     const { signOut } = useAuth();
@@ -140,18 +142,14 @@ function ManagerMaintenanceListPage() {
 
     if (loading) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.header}>
-                        <h1 className={styles.title}>All Maintenance Requests</h1>
-                        <button className={styles.signOutBtn} onClick={signOut}>
-                            Sign Out
-                        </button>
-                    </div>
-                    <div className={styles.maintenanceContainer}>
-                        <p>Loading maintenance requests...</p>
-                    </div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <PageHeader
+                        title="All Maintenance Requests"
+                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    />
+                    <p className="text-secondary-600">Loading maintenance requests...</p>
                 </div>
             </div>
         )
@@ -159,40 +157,36 @@ function ManagerMaintenanceListPage() {
 
     if (error) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.header}>
-                        <h1 className={styles.title}>All Maintenance Requests</h1>
-                        <button className={styles.signOutBtn} onClick={signOut}>
-                            Sign Out
-                        </button>
-                    </div>
-                    <div className={styles.maintenanceContainer}>
-                        <p style={{ color: 'red' }}>{error}</p>
-                    </div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <PageHeader
+                        title="All Maintenance Requests"
+                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    />
+                    <p className="text-error-600">{error}</p>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className={styles.container}>
+        <div className="flex min-h-screen">
             {nav}
-            <div className={styles.content}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>All Maintenance Requests</h1>
-                    <button className={styles.signOutBtn} onClick={signOut}>
-                        Sign Out
-                    </button>
-                </div>
-                <div className={styles.maintenanceContainer}>
-                    {tickets.length === 0 ? (
-                        <p>No maintenance requests found.</p>
-                    ) : (
-                        <ManagerMaintenanceList tickets={tickets} />
-                    )}
-                </div>
+            <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                <PageHeader
+                    title="All Maintenance Requests"
+                    actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                />
+                {tickets.length === 0 ? (
+                    <EmptyState
+                        icon={<Wrench size={48} />}
+                        title="No maintenance requests"
+                        description="There are no maintenance requests at this time."
+                    />
+                ) : (
+                    <ManagerMaintenanceList tickets={tickets} />
+                )}
             </div>
         </div>
     )

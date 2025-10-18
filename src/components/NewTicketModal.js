@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import styles from './NewTicketModal.module.css';
+import Modal from './ui/Modal';
+import Input from './ui/Input';
+import TextArea from './ui/TextArea';
+import Select from './ui/Select';
+import Button from './ui/Button';
 
 function NewTicketModal({ setIsOpen, onReportCreated }) {
     const { user } = useAuth();
@@ -158,181 +162,132 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     };
 
     return (
-        <div className={styles.modalContainer}>
-            <form className={styles.addForm} onSubmit={handleSubmit}>
-                <h2 style={{ margin: 0, marginBottom: '0.5rem' }}>New Maintenance Report</h2>
+        <Modal isOpen={true} onClose={() => setIsOpen(false)} size="lg">
+            <Modal.Header onClose={() => setIsOpen(false)}>
+                <Modal.Title>New Maintenance Report</Modal.Title>
+            </Modal.Header>
 
-                {error && (
-                    <div style={{
-                        backgroundColor: '#fee',
-                        color: '#c33',
-                        padding: '0.75rem',
-                        borderRadius: '6px',
-                        fontSize: '0.9rem'
-                    }}>
-                        {error}
-                    </div>
-                )}
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="unit">Unit Number *</label>
-                    <input
-                        id="unit"
-                        placeholder="e.g., A-203, B-105"
-                        type="text"
-                        value={formData.unit}
-                        onChange={handleInputChange}
-                        required
-                        disabled={loading}
-                    />
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="title">What's Broken? *</label>
-                    <textarea
-                        id="title"
-                        placeholder="Brief summary of the issue..."
-                        rows="3"
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        required
-                        disabled={loading}
-                    />
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="description">Damage Description *</label>
-                    <textarea
-                        id="description"
-                        placeholder="Please describe the damage in detail..."
-                        rows="4"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        required
-                        disabled={loading}
-                    />
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="severity">Severity Level</label>
-                    <select
-                        id="severity"
-                        value={formData.severity}
-                        onChange={handleInputChange}
-                        disabled={loading}
-                        style={{
-                            border: '1px solid transparent',
-                            borderRadius: '6px',
-                            padding: '0.75rem',
-                            fontSize: '1rem',
-                            backgroundColor: 'white'
-                        }}
-                    >
-                        <option value="low">Low - Can wait</option>
-                        <option value="medium">Medium - Normal priority</option>
-                        <option value="high">High - Urgent</option>
-                        <option value="urgent">Urgent - Safety concern</option>
-                    </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="images">Add Photos (Optional)</label>
-                    <p style={{ fontSize: '0.85rem', margin: '0', color: '#666' }}>
-                        Max 5 images, 5MB each
-                    </p>
-                    <input
-                        id="images"
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleFileSelect}
-                        disabled={loading}
-                        style={{
-                            border: '1px solid transparent',
-                            borderRadius: '6px',
-                            padding: '0.75rem',
-                            backgroundColor: 'white'
-                        }}
-                    />
-                </div>
-
-                {filePreviews.length > 0 && (
-                    <div className={styles.formGroup}>
-                        <label>Selected Images ({filePreviews.length})</label>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
-                            gap: '0.5rem'
-                        }}>
-                            {filePreviews.map((preview, index) => (
-                                <div key={index} style={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    paddingBottom: '100%',
-                                    backgroundColor: '#e0e0e0',
-                                    borderRadius: '4px',
-                                    overflow: 'hidden'
-                                }}>
-                                    <img
-                                        src={preview}
-                                        alt={`Preview ${index + 1}`}
-                                        style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
-                                        }}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeFile(index)}
-                                        style={{
-                                            position: 'absolute',
-                                            top: '-5px',
-                                            right: '-5px',
-                                            width: '24px',
-                                            height: '24px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#ff4444',
-                                            color: 'white',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '16px',
-                                            fontWeight: 'bold'
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-                            ))}
+            <form onSubmit={handleSubmit}>
+                <Modal.Content>
+                    {error && (
+                        <div className="bg-error-50 text-error-700 p-3 rounded-lg text-sm mb-4">
+                            {error}
                         </div>
-                    </div>
-                )}
+                    )}
 
-                <div className={styles.formActions}>
-                    <button
+                    <div className="space-y-4">
+                        <Input
+                            label="Unit Number *"
+                            id="unit"
+                            placeholder="e.g., A-203, B-105"
+                            type="text"
+                            value={formData.unit}
+                            onChange={handleInputChange}
+                            required
+                            disabled={loading}
+                        />
+
+                        <TextArea
+                            label="What's Broken? *"
+                            id="title"
+                            placeholder="Brief summary of the issue..."
+                            rows={3}
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            required
+                            disabled={loading}
+                        />
+
+                        <TextArea
+                            label="Damage Description *"
+                            id="description"
+                            placeholder="Please describe the damage in detail..."
+                            rows={4}
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            required
+                            disabled={loading}
+                        />
+
+                        <Select
+                            label="Severity Level"
+                            id="severity"
+                            value={formData.severity}
+                            onChange={handleInputChange}
+                            disabled={loading}
+                        >
+                            <option value="low">Low - Can wait</option>
+                            <option value="medium">Medium - Normal priority</option>
+                            <option value="high">High - Urgent</option>
+                            <option value="urgent">Urgent - Safety concern</option>
+                        </Select>
+
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-semibold text-secondary-700">
+                                Add Photos (Optional)
+                            </label>
+                            <p className="text-xs text-secondary-500">
+                                Max 5 images, 5MB each
+                            </p>
+                            <input
+                                id="images"
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                disabled={loading}
+                                className="w-full px-4 py-3 border border-secondary-300 rounded-lg transition-smooth focus-ring bg-white"
+                            />
+                        </div>
+
+                        {filePreviews.length > 0 && (
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-semibold text-secondary-700">
+                                    Selected Images ({filePreviews.length})
+                                </label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {filePreviews.map((preview, index) => (
+                                        <div key={index} className="relative aspect-square bg-secondary-200 rounded-lg overflow-hidden">
+                                            <img
+                                                src={preview}
+                                                alt={`Preview ${index + 1}`}
+                                                className="absolute inset-0 w-full h-full object-cover"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeFile(index)}
+                                                className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-error text-white border-none cursor-pointer flex items-center justify-center text-base font-bold hover:bg-error-600 transition-smooth"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </Modal.Content>
+
+                <Modal.Footer>
+                    <Button
                         type="button"
                         onClick={() => setIsOpen(false)}
-                        className={styles.cancel}
+                        variant="secondary"
                         disabled={loading}
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        className={styles.submit}
+                        variant="primary"
                         disabled={loading}
+                        loading={loading}
                     >
-                        {loading ? 'Submitting...' : 'Submit Report'}
-                    </button>
-                </div>
+                        Submit Report
+                    </Button>
+                </Modal.Footer>
             </form>
-        </div>
+        </Modal>
     );
 }
 

@@ -2,9 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
-import styles from "./Reports.module.css";
 import { useAuth } from '../../contexts/AuthContext';
 import { Wrench, LayoutDashboard, Users, AlertCircle, Clock, CheckCircle, Activity } from "lucide-react";
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import PageHeader from '../../components/ui/PageHeader';
+import StatCard from '../../components/ui/StatCard';
+import Badge from '../../components/ui/Badge';
 
 function ManagerDashboard() {
     const { signOut } = useAuth();
@@ -91,251 +95,112 @@ function ManagerDashboard() {
         ]}
         />)
 
-    const StatCard = ({ title, value, icon, color }) => (
-        <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '20px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-        }}>
-            <div>
-                <p style={{
-                    margin: '0 0 4px 0',
-                    fontSize: '14px',
-                    color: '#6b7280',
-                    fontWeight: '500'
-                }}>
-                    {title}
-                </p>
-                <p style={{
-                    margin: '0',
-                    fontSize: '32px',
-                    fontWeight: 'bold',
-                    color: '#1f2937'
-                }}>
-                    {value}
-                </p>
-            </div>
-            <div style={{
-                backgroundColor: color + '20',
-                borderRadius: '50%',
-                padding: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                {icon}
-            </div>
-        </div>
-    );
-
-    const getSeverityColor = (severity) => {
-        switch (severity?.toLowerCase()) {
-            case 'urgent': return '#ef4444';
-            case 'high': return '#f59e0b';
-            case 'medium': return '#3b82f6';
-            case 'low': return '#10b981';
-            default: return '#3b82f6';
-        }
-    };
-
-    const getStatusColor = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'open': return '#ef4444';
-            case 'in-progress': return '#f59e0b';
-            case 'resolved': return '#10b981';
-            default: return '#6b7280';
-        }
-    };
-
     if (loading) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.header}>
-                        <h1 className={styles.title}>Manager Dashboard</h1>
-                        <button className={styles.signOutBtn} onClick={signOut}>
-                            Sign Out
-                        </button>
-                    </div>
-                    <div style={{ padding: '24px' }}>
-                        <p>Loading dashboard...</p>
-                    </div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <PageHeader
+                        title="Manager Dashboard"
+                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    />
+                    <p className="text-secondary-600">Loading dashboard...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className={styles.container}>
+        <div className="flex min-h-screen">
             {nav}
-            <div className={styles.content}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Manager Dashboard</h1>
-                    <button className={styles.signOutBtn} onClick={signOut}>
-                        Sign Out
-                    </button>
+            <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                <PageHeader
+                    title="Manager Dashboard"
+                    actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                />
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                    <StatCard
+                        title="Total Reports"
+                        value={stats.total}
+                        icon={<Activity size={24} />}
+                        color="primary"
+                    />
+                    <StatCard
+                        title="Open"
+                        value={stats.open}
+                        icon={<AlertCircle size={24} />}
+                        color="error"
+                    />
+                    <StatCard
+                        title="In Progress"
+                        value={stats.inProgress}
+                        icon={<Clock size={24} />}
+                        color="warning"
+                    />
+                    <StatCard
+                        title="Resolved"
+                        value={stats.resolved}
+                        icon={<CheckCircle size={24} />}
+                        color="success"
+                    />
+                    <StatCard
+                        title="Active Tenants"
+                        value={stats.tenantCount}
+                        icon={<Users size={24} />}
+                        color="secondary"
+                    />
                 </div>
 
-                <div style={{ padding: '24px' }}>
-                    {/* Stats Grid */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '16px',
-                        marginBottom: '24px'
-                    }}>
-                        <StatCard
-                            title="Total Reports"
-                            value={stats.total}
-                            icon={<Activity size={24} style={{ color: '#3b82f6' }} />}
-                            color="#3b82f6"
-                        />
-                        <StatCard
-                            title="Open"
-                            value={stats.open}
-                            icon={<AlertCircle size={24} style={{ color: '#ef4444' }} />}
-                            color="#ef4444"
-                        />
-                        <StatCard
-                            title="In Progress"
-                            value={stats.inProgress}
-                            icon={<Clock size={24} style={{ color: '#f59e0b' }} />}
-                            color="#f59e0b"
-                        />
-                        <StatCard
-                            title="Resolved"
-                            value={stats.resolved}
-                            icon={<CheckCircle size={24} style={{ color: '#10b981' }} />}
-                            color="#10b981"
-                        />
-                        <StatCard
-                            title="Active Tenants"
-                            value={stats.tenantCount}
-                            icon={<Users size={24} style={{ color: '#8b5cf6' }} />}
-                            color="#8b5cf6"
-                        />
-                    </div>
-
-                    {/* Recent Activity */}
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        padding: '24px',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                    }}>
-                        <h2 style={{
-                            margin: '0 0 16px 0',
-                            fontSize: '20px',
-                            fontWeight: '600',
-                            color: '#1f2937'
-                        }}>
-                            Recent Activity
-                        </h2>
+                {/* Recent Activity */}
+                <Card>
+                    <Card.Header>
+                        <Card.Title>Recent Activity</Card.Title>
+                    </Card.Header>
+                    <Card.Content>
                         {recentReports.length === 0 ? (
-                            <p style={{ color: '#6b7280', margin: '20px 0' }}>No recent reports</p>
+                            <p className="text-secondary-500">No recent reports</p>
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <div className="flex flex-col gap-3">
                                 {recentReports.map(report => (
                                     <div
                                         key={report.id}
                                         onClick={() => navigate(`/manager/reports/${report.id}`)}
-                                        style={{
-                                            padding: '16px',
-                                            border: '1px solid #e5e7eb',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            backgroundColor: '#fafbfc'
-                                        }}
-                                        onMouseEnter={e => {
-                                            e.currentTarget.style.backgroundColor = '#f3f4f6';
-                                            e.currentTarget.style.borderColor = '#d1d5db';
-                                        }}
-                                        onMouseLeave={e => {
-                                            e.currentTarget.style.backgroundColor = '#fafbfc';
-                                            e.currentTarget.style.borderColor = '#e5e7eb';
-                                        }}
+                                        className="p-4 border border-secondary-200 rounded-lg cursor-pointer transition-all hover:bg-secondary-50 hover:border-secondary-300"
                                     >
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'flex-start',
-                                            marginBottom: '8px'
-                                        }}>
-                                            <div style={{ flex: 1 }}>
-                                                <p style={{
-                                                    margin: '0 0 4px 0',
-                                                    fontSize: '14px',
-                                                    fontWeight: '600',
-                                                    color: '#1f2937'
-                                                }}>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex-1">
+                                                <p className="text-sm font-semibold text-secondary-800 mb-1">
                                                     {report.description}
                                                 </p>
-                                                <p style={{
-                                                    margin: '0',
-                                                    fontSize: '13px',
-                                                    color: '#6b7280'
-                                                }}>
+                                                <p className="text-sm text-secondary-600">
                                                     {report.tenant} - Unit {report.unit}
                                                 </p>
                                             </div>
-                                            <span style={{
-                                                fontSize: '12px',
-                                                color: '#6b7280',
-                                                marginLeft: '12px'
-                                            }}>
+                                            <span className="text-xs text-secondary-500 ml-3">
                                                 {report.date}
                                             </span>
                                         </div>
-                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                            <span style={{
-                                                fontSize: '12px',
-                                                padding: '4px 8px',
-                                                borderRadius: '4px',
-                                                backgroundColor: getStatusColor(report.status) + '20',
-                                                color: getStatusColor(report.status),
-                                                fontWeight: '500'
-                                            }}>
+                                        <div className="flex gap-2 items-center">
+                                            <Badge variant={report.status}>
                                                 {report.status}
-                                            </span>
-                                            <span style={{
-                                                fontSize: '12px',
-                                                padding: '4px 8px',
-                                                borderRadius: '4px',
-                                                backgroundColor: getSeverityColor(report.severity) + '20',
-                                                color: getSeverityColor(report.severity),
-                                                fontWeight: '500'
-                                            }}>
+                                            </Badge>
+                                            <Badge variant={report.severity}>
                                                 {report.severity}
-                                            </span>
+                                            </Badge>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         )}
-                        <button
-                            onClick={() => navigate('/manager/reports')}
-                            style={{
-                                marginTop: '16px',
-                                padding: '10px 20px',
-                                backgroundColor: '#3b82f6',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                fontWeight: '500'
-                            }}
-                        >
+                    </Card.Content>
+                    <Card.Footer>
+                        <Button onClick={() => navigate('/manager/reports')}>
                             View All Reports →
-                        </button>
-                    </div>
-                </div>
+                        </Button>
+                    </Card.Footer>
+                </Card>
             </div>
         </div>
     );

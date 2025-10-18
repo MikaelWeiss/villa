@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import styles from './ManagerMaintenanceList.module.css';
 import { Inbox } from 'lucide-react';
+import Card from './ui/Card';
+import Badge from './ui/Badge';
+import EmptyState from './ui/EmptyState';
 
 function ManagerMaintenanceList({ tickets }) {
     const navigate = useNavigate();
@@ -12,65 +14,61 @@ function ManagerMaintenanceList({ tickets }) {
 
     if (tickets.length === 0) {
         return (
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '60px 20px',
-                color: '#9ca3af'
-            }}>
-                <Inbox size={64} style={{ marginBottom: '16px', opacity: 0.3 }} />
-                <p style={{ margin: '0', fontSize: '18px', fontWeight: '500', color: '#6b7280' }}>
-                    No maintenance requests found
-                </p>
-                <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>
-                    All maintenance requests from tenants will appear here
-                </p>
-            </div>
+            <EmptyState
+                icon={<Inbox size={64} />}
+                title="No maintenance requests found"
+                description="All maintenance requests from tenants will appear here"
+            />
         );
     }
 
     return (
-        <div>
-            <ul className={styles.ul}>
-                {tickets.map((ticket) => (
-                    <li className={styles.li}
-                        key={ticket.id}
-                        onClick={() => handleTicketClick(ticket.id)}
-                        style={{ cursor: 'pointer' }}>
-                        <Ticket ticket={ticket} />
-                    </li>
-                ))}
-            </ul>
+        <div className="space-y-4">
+            {tickets.map((ticket) => (
+                <div
+                    key={ticket.id}
+                    onClick={() => handleTicketClick(ticket.id)}
+                    className="hover:bg-secondary-50 transition-smooth cursor-pointer"
+                >
+                    <Ticket ticket={ticket} />
+                </div>
+            ))}
         </div>
     )
 
     function Ticket({ ticket }) {
         return (
-            <div className={styles.ticketContainer}>
-                <div className={styles.ticketHeader}>
-                    <h3>{ticket.title}</h3>
-                    <span className={styles.tenantInfo}>{ticket.tenantName} - {ticket.property || ticket.unit}</span>
+            <Card>
+                <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-secondary-800 mb-1">
+                            {ticket.title}
+                        </h3>
+                        <span className="text-sm text-secondary-600">
+                            {ticket.tenantName} - {ticket.property || ticket.unit}
+                        </span>
+                    </div>
                 </div>
-                <div className={styles.ticketInfo}>
-                    <p>{ticket.date}</p>
-                    <p className={styles.severity}>{ticket.severity || 'medium'}</p>
+                <div className="flex items-center gap-3 mb-3 text-sm text-secondary-500">
+                    <span>{ticket.date}</span>
+                    <Badge variant={ticket.severity || 'medium'}>
+                        {ticket.severity || 'medium'}
+                    </Badge>
                 </div>
-                <p>{ticket.description}</p>
+                <p className="text-secondary-700 mb-3">{ticket.description}</p>
                 {ticket.image_urls && ticket.image_urls.length > 0 && (
-                    <div className={styles.imageGallery}>
+                    <div className="grid grid-cols-4 gap-2 mt-4">
                         {ticket.image_urls.map((url, index) => (
                             <img
                                 key={index}
                                 src={url}
                                 alt={`Report image ${index + 1}`}
-                                className={styles.imageThumbnail}
+                                className="w-full h-24 object-cover rounded-lg"
                             />
                         ))}
                     </div>
                 )}
-            </div>
+            </Card>
         )
     }
 }

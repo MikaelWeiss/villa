@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
+import TextArea from '../components/ui/TextArea';
+import Card from '../components/ui/Card';
 
 export default function RequestQuote() {
   React.useEffect(() => {
@@ -51,62 +55,92 @@ export default function RequestQuote() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0f1e 0%, #000000 100%)', color: 'white' }}>
-      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div className="min-h-screen bg-gradient-to-br from-secondary-900 to-black text-white">
+      <header className="flex items-center justify-between px-8 py-6 border-b border-white border-opacity-10">
+        <div className="flex items-center gap-3">
           <img src="/favicon-32x32.png" alt="Villa" width={28} height={28} />
-          <strong style={{ fontSize: 18 }}>Villa</strong>
+          <span className="text-lg font-bold">Villa</span>
         </div>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Link to="/" style={{ color: 'white', textDecoration: 'none', opacity: 0.9 }}>Home</Link>
-          <Link to="/signin" style={{ color: '#0a0f1e', background: 'white', padding: '10px 14px', borderRadius: 8, textDecoration: 'none', fontWeight: 600 }}>Sign in</Link>
+        <nav className="flex items-center gap-4">
+          <Link to="/" className="hover:text-primary-300 transition-smooth">Home</Link>
+          <Link to="/signin">
+            <Button variant="secondary">Sign in</Button>
+          </Link>
         </nav>
       </header>
 
-      <main style={{ padding: '48px 24px' }}>
-        <div style={{ maxWidth: 920, margin: '0 auto' }}>
-          <h1 style={{ margin: 0, fontSize: 36 }}>Request a quote</h1>
-          <p style={{ marginTop: 8, color: 'rgba(255,255,255,0.85)' }}>Tell us a bit about your properties and we will reach out shortly.</p>
+      <main className="px-6 py-12">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="mb-2">Request a quote</h1>
+          <p className="text-white text-opacity-85 mb-6">Tell us a bit about your properties and we will reach out shortly.</p>
 
           {submitted && (
-            <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: 'rgba(46, 204, 113, 0.15)', border: '1px solid rgba(46, 204, 113, 0.35)' }}>
+            <div className="mb-6 px-4 py-3 rounded-lg bg-success-100 bg-opacity-20 border border-success-400 text-white">
               Thanks! We received your request and will be in touch.
             </div>
           )}
           {error && (
-            <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.35)' }}>
+            <div className="mb-6 px-4 py-3 rounded-lg bg-error-100 bg-opacity-20 border border-error-400 text-white">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: 20 }}>
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span>Name</span>
-              <input value={formState.name} onChange={e => updateField('name', e.target.value)} required placeholder="Full name" style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.3)', color: 'white' }} />
-            </label>
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span>Email</span>
-              <input type="email" value={formState.email} onChange={e => updateField('email', e.target.value)} required placeholder="you@company.com" style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.3)', color: 'white' }} />
-            </label>
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span>Phone</span>
-              <input value={formState.phone} onChange={e => updateField('phone', e.target.value)} placeholder="(555) 555-5555" style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.3)', color: 'white' }} />
-            </label>
-            <label style={{ display: 'grid', gap: 6 }}>
-              <span>Portfolio size</span>
-              <input value={formState.portfolioSize} onChange={e => updateField('portfolioSize', e.target.value)} placeholder="Units or doors" style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.3)', color: 'white' }} />
-            </label>
-            <label style={{ display: 'grid', gap: 6, gridColumn: '1 / -1' }}>
-              <span>What are you looking to improve?</span>
-              <textarea value={formState.message} onChange={e => updateField('message', e.target.value)} rows={6} placeholder="Share any context (e.g., current tools, challenges, timelines)" style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.3)', color: 'white', resize: 'vertical' }} />
-            </label>
-            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 12, alignItems: 'center' }}>
-              <button type="submit" disabled={submitting} style={{ background: 'white', color: '#0a0f1e', padding: '12px 16px', borderRadius: 10, fontWeight: 700, border: 0, cursor: 'pointer', opacity: submitting ? 0.7 : 1 }}>
-                {submitting ? 'Submitting…' : 'Request a quote'}
-              </button>
-              <Link to="/" style={{ color: 'white' }}>Back to home</Link>
-            </div>
-          </form>
+          <Card className="bg-white bg-opacity-5 border border-white border-opacity-10">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Name"
+                value={formState.name}
+                onChange={e => updateField('name', e.target.value)}
+                required
+                placeholder="Full name"
+                className="bg-black bg-opacity-30 border-white border-opacity-20 text-white placeholder:text-white placeholder:text-opacity-50"
+                containerClassName="text-white"
+              />
+              <Input
+                type="email"
+                label="Email"
+                value={formState.email}
+                onChange={e => updateField('email', e.target.value)}
+                required
+                placeholder="you@company.com"
+                className="bg-black bg-opacity-30 border-white border-opacity-20 text-white placeholder:text-white placeholder:text-opacity-50"
+                containerClassName="text-white"
+              />
+              <Input
+                label="Phone"
+                value={formState.phone}
+                onChange={e => updateField('phone', e.target.value)}
+                placeholder="(555) 555-5555"
+                className="bg-black bg-opacity-30 border-white border-opacity-20 text-white placeholder:text-white placeholder:text-opacity-50"
+                containerClassName="text-white"
+              />
+              <Input
+                label="Portfolio size"
+                value={formState.portfolioSize}
+                onChange={e => updateField('portfolioSize', e.target.value)}
+                placeholder="Units or doors"
+                className="bg-black bg-opacity-30 border-white border-opacity-20 text-white placeholder:text-white placeholder:text-opacity-50"
+                containerClassName="text-white"
+              />
+              <div className="md:col-span-2">
+                <TextArea
+                  label="What are you looking to improve?"
+                  value={formState.message}
+                  onChange={e => updateField('message', e.target.value)}
+                  rows={6}
+                  placeholder="Share any context (e.g., current tools, challenges, timelines)"
+                  className="bg-black bg-opacity-30 border-white border-opacity-20 text-white placeholder:text-white placeholder:text-opacity-50"
+                  containerClassName="text-white"
+                />
+              </div>
+              <div className="md:col-span-2 flex gap-3 items-center">
+                <Button type="submit" disabled={submitting} loading={submitting} variant="secondary" size="lg">
+                  Request a quote
+                </Button>
+                <Link to="/" className="text-white hover:text-primary-300 transition-smooth">Back to home</Link>
+              </div>
+            </form>
+          </Card>
         </div>
       </main>
     </div>

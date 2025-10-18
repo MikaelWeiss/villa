@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
-import styles from "./Reports.module.css";
 import { Wrench, LayoutDashboard, Users } from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/ui/Button';
+import PageHeader from '../../components/ui/PageHeader';
+import EmptyState from '../../components/ui/EmptyState';
 
 function ManagerTenantsPage() {
     const { signOut } = useAuth();
@@ -108,18 +110,14 @@ function ManagerTenantsPage() {
 
     if (loading) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.header}>
-                        <h1 className={styles.title}>Tenants</h1>
-                        <button className={styles.signOutBtn} onClick={signOut}>
-                            Sign Out
-                        </button>
-                    </div>
-                    <div className={styles.maintenanceContainer}>
-                        <p>Loading tenants...</p>
-                    </div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <PageHeader
+                        title="Tenants"
+                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    />
+                    <p className="text-secondary-600">Loading tenants...</p>
                 </div>
             </div>
         )
@@ -127,132 +125,84 @@ function ManagerTenantsPage() {
 
     if (error) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.header}>
-                        <h1 className={styles.title}>Tenants</h1>
-                        <button className={styles.signOutBtn} onClick={signOut}>
-                            Sign Out
-                        </button>
-                    </div>
-                    <div className={styles.maintenanceContainer}>
-                        <p style={{ color: 'red' }}>{error}</p>
-                    </div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <PageHeader
+                        title="Tenants"
+                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    />
+                    <p className="text-error-600">{error}</p>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className={styles.container}>
+        <div className="flex min-h-screen">
             {nav}
-            <div className={styles.content}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Tenants</h1>
-                    <button className={styles.signOutBtn} onClick={signOut}>
-                        Sign Out
-                    </button>
-                </div>
-                <div className={styles.maintenanceContainer}>
-                    {tenants.length === 0 ? (
-                        <p>No tenants found.</p>
-                    ) : (
-                        <div style={{ width: '100%' }}>
-                            <table style={{
-                                width: '100%',
-                                borderCollapse: 'collapse',
-                                backgroundColor: 'white',
-                                borderRadius: '8px',
-                                overflow: 'hidden',
-                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                            }}>
-                                <thead>
-                                    <tr style={{
-                                        backgroundColor: '#f5f7fa',
-                                        borderBottom: '2px solid #e5e7eb'
-                                    }}>
-                                        <th style={{
-                                            padding: '1rem',
-                                            textAlign: 'left',
-                                            fontWeight: '600',
-                                            color: '#333'
-                                        }}>
-                                            Tenant Name
-                                        </th>
-                                        <th style={{
-                                            padding: '1rem',
-                                            textAlign: 'left',
-                                            fontWeight: '600',
-                                            color: '#333'
-                                        }}>
-                                            Units
-                                        </th>
-                                        <th style={{
-                                            padding: '1rem',
-                                            textAlign: 'center',
-                                            fontWeight: '600',
-                                            color: '#333'
-                                        }}>
-                                            Open Reports
-                                        </th>
-                                        <th style={{
-                                            padding: '1rem',
-                                            textAlign: 'center',
-                                            fontWeight: '600',
-                                            color: '#333'
-                                        }}>
-                                            Total Reports
-                                        </th>
+            <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                <PageHeader
+                    title="Tenants"
+                    actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                />
+                {tenants.length === 0 ? (
+                    <EmptyState
+                        icon={<Users size={48} />}
+                        title="No tenants found"
+                        description="There are no tenants with maintenance requests at this time."
+                    />
+                ) : (
+                    <div className="w-full">
+                        <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm">
+                            <thead>
+                                <tr className="bg-secondary-50 border-b-2 border-secondary-200">
+                                    <th className="p-4 text-left font-semibold text-secondary-800">
+                                        Tenant Name
+                                    </th>
+                                    <th className="p-4 text-left font-semibold text-secondary-800">
+                                        Units
+                                    </th>
+                                    <th className="p-4 text-center font-semibold text-secondary-800">
+                                        Open Reports
+                                    </th>
+                                    <th className="p-4 text-center font-semibold text-secondary-800">
+                                        Total Reports
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tenants.map((tenant, index) => (
+                                    <tr
+                                        key={tenant.tenant_id}
+                                        className={`border-b border-secondary-200 last:border-b-0 ${
+                                            index % 2 === 0 ? 'bg-white' : 'bg-secondary-25'
+                                        }`}
+                                    >
+                                        <td className="p-4 text-secondary-800">
+                                            {tenant.tenant_name || 'Unknown'}
+                                        </td>
+                                        <td className="p-4 text-secondary-600">
+                                            {tenant.units}
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <span className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
+                                                tenant.openReports > 0
+                                                    ? 'bg-error-100 text-error-700'
+                                                    : 'bg-success-100 text-success-700'
+                                            }`}>
+                                                {tenant.openReports}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-center text-secondary-600">
+                                            {tenant.totalReports}
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {tenants.map((tenant, index) => (
-                                        <tr key={tenant.tenant_id} style={{
-                                            borderBottom: index !== tenants.length - 1 ? '1px solid #e5e7eb' : 'none',
-                                            backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafbfc'
-                                        }}>
-                                            <td style={{
-                                                padding: '1rem',
-                                                color: '#333'
-                                            }}>
-                                                {tenant.tenant_name || 'Unknown'}
-                                            </td>
-                                            <td style={{
-                                                padding: '1rem',
-                                                color: '#666'
-                                            }}>
-                                                {tenant.units}
-                                            </td>
-                                            <td style={{
-                                                padding: '1rem',
-                                                textAlign: 'center',
-                                                color: tenant.openReports > 0 ? '#d32f2f' : '#4caf50'
-                                            }}>
-                                                <span style={{
-                                                    display: 'inline-block',
-                                                    padding: '0.25rem 0.75rem',
-                                                    backgroundColor: tenant.openReports > 0 ? '#ffe5e5' : '#e8f5e9',
-                                                    borderRadius: '20px',
-                                                    fontWeight: '600'
-                                                }}>
-                                                    {tenant.openReports}
-                                                </span>
-                                            </td>
-                                            <td style={{
-                                                padding: '1rem',
-                                                textAlign: 'center',
-                                                color: '#666'
-                                            }}>
-                                                {tenant.totalReports}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     )
