@@ -72,7 +72,8 @@ function TenantDashboard() {
         title: `Unit ${report.unit}`,
         date: new Date(report.created_at).toLocaleDateString(),
         severity: report.severity || 'medium',
-        description: report.description
+        description: report.description,
+        image_urls: report.image_urls || []
     }));
 
     const maintenanceContent = (
@@ -97,7 +98,7 @@ function TenantDashboard() {
     return (
         <div className={styles.container}>
             {nav}
-            {isOpen && (<NewTicketModal setIsOpen={setIsOpen} />)}
+            {isOpen && (<NewTicketModal setIsOpen={setIsOpen} onReportCreated={fetchReports} />)}
             <div className={styles.content}>
                 <div className={styles.header}>
                     <h1 className={styles.title}>Dashboard</h1>

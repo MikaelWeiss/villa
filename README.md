@@ -103,7 +103,9 @@ This app uses the following tables:
 - `tenant_name` (text)
 - `unit` (text)
 - `description` (text)
+- `severity` (text) - 'low', 'medium', 'high', or 'urgent'
 - `status` (text) - 'open', 'in-progress', or 'resolved'
+- `image_urls` (text[]) - Array of signed URLs to damage images stored in Storage
 - `created_at` (timestamp)
 - `updated_at` (timestamp)
 
@@ -123,7 +125,39 @@ This app uses the following tables:
 - `source` (text)
 - `created_at` (timestamp)
 
-### 3. RPC Functions
+### 3. Storage Setup
+
+Create a Storage bucket for damage report images:
+
+1. In Supabase dashboard: Storage > Create a new bucket
+2. Bucket name: `damage-reports`
+3. Public bucket: Yes (to allow image viewing)
+
+### Storage RLS Policies
+
+Set up Row Level Security policies for the `damage-reports` bucket:
+
+**Policy 1: Tenants can upload their own damage images**
+- Target roles: `authenticated`
+- Definition: `(auth.uid()::text = (storage.foldername(name))[1])`
+- Allowed operations: `INSERT`
+
+**Policy 2: Tenants can view their own damage images**
+- Target roles: `authenticated`
+- Definition: `(auth.uid()::text = (storage.foldername(name))[1])`
+- Allowed operations: `SELECT`
+
+**Policy 3: Managers can view all damage images**
+- Target roles: `authenticated`
+- Definition: `is_manager((SELECT email FROM auth.users WHERE id = auth.uid()))`
+- Allowed operations: `SELECT`
+
+**Policy 4: Tenants can delete their own damage images**
+- Target roles: `authenticated`
+- Definition: `(auth.uid()::text = (storage.foldername(name))[1])`
+- Allowed operations: `DELETE`
+
+### 4. RPC Functions
 
 Create the `is_manager` function in your Supabase SQL Editor:
 
@@ -141,7 +175,7 @@ END;
 $$;
 ```
 
-### 4. Row Level Security (RLS)
+### 5. Row Level Security (RLS) on Database Tables
 
 Enable RLS on your tables and add appropriate policies:
 
@@ -168,7 +202,7 @@ CREATE POLICY "Managers can update all reports"
   USING (is_manager((SELECT email FROM auth.users WHERE id = auth.uid())));
 ```
 
-### 5. Authentication
+### 6. Authentication
 
 The app uses magic link authentication (passwordless email login).
 
@@ -179,7 +213,7 @@ To configure email settings in Supabase:
 
 Magic link authentication is enabled by default in Supabase and requires no additional setup.
 
-### 6. Running Locally
+### 7. Running Locally
 
 ```bash
 npm install
@@ -188,7 +222,7 @@ npm start
 
 The app will open at [http://localhost:3000](http://localhost:3000)
 
-### 7. Application Structure
+### 8. Application Structure
 
 - `src/authentication/supabase.js` - Supabase client initialization
 - `src/authentication/index.js` - Auth context provider with magic link authentication

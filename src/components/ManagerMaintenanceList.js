@@ -36,6 +36,18 @@ function ManagerMaintenanceList({ tickets }) {
                     <p className={styles.severity}>{ticket.severity || 'medium'}</p>
                 </div>
                 <p>{ticket.description}</p>
+                {ticket.image_urls && ticket.image_urls.length > 0 && (
+                    <div className={styles.imageGallery}>
+                        {ticket.image_urls.map((url, index) => (
+                            <img
+                                key={index}
+                                src={url}
+                                alt={`Report image ${index + 1}`}
+                                className={styles.imageThumbnail}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         )
     }

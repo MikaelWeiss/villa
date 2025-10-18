@@ -63,7 +63,8 @@ function ManagerMaintenanceDetail() {
                     severity: data.severity || 'medium',
                     status: data.status || 'open',
                     unitNumber: data.unit,
-                    updatedAt: data.updated_at || data.created_at
+                    updatedAt: data.updated_at || data.created_at,
+                    image_urls: data.image_urls || []
                 });
             } else {
                 setError('Maintenance request not found');
@@ -205,6 +206,23 @@ function ManagerMaintenanceDetail() {
                                 <h3>Description</h3>
                                 <p className={styles.description}>{maintenanceRequest.description}</p>
                             </div>
+
+                            {maintenanceRequest.image_urls && maintenanceRequest.image_urls.length > 0 && (
+                                <div className={styles.imagesSection}>
+                                    <h3>Photos</h3>
+                                    <div className={styles.imageGallery}>
+                                        {maintenanceRequest.image_urls.map((url, index) => (
+                                            <div key={index} className={styles.imageWrapper}>
+                                                <img
+                                                    src={url}
+                                                    alt={`Report image ${index + 1}`}
+                                                    className={styles.image}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <StatusSelector

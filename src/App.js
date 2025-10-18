@@ -11,6 +11,7 @@ import TenantReports from './pages/tenant/Reports';
 import TenantPayments from './pages/tenant/Payments';
 import ManagerDashboard from './pages/manager/Dashboard';
 import ManagerReports from './pages/manager/Reports';
+import ManagerTenants from './pages/manager/Tenants';
 import ReportDetails from './pages/manager/ReportDetails';
 
 // Component to handle role-based redirect from root
@@ -72,6 +73,14 @@ function App() {
             element={
               <ProtectedRoute requireRole="manager">
                 <ManagerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/tenants"
+            element={
+              <ProtectedRoute requireRole="manager">
+                <ManagerTenants />
               </ProtectedRoute>
             }
           />

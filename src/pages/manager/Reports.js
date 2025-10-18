@@ -57,7 +57,8 @@ function ManagerMaintenanceListPage() {
                 tenantName: report.tenant_name || 'Unknown tenant',
                 property: report.unit || 'Unknown unit',
                 unit: report.unit,
-                status: report.status || 'open'
+                status: report.status || 'open',
+                image_urls: report.image_urls || []
             }));
 
             setTickets(fetchedTickets);
@@ -86,7 +87,8 @@ function ManagerMaintenanceListPage() {
             tenantName: report.tenant_name || 'Unknown tenant',
             property: report.unit || 'Unknown unit',
             unit: report.unit,
-            status: report.status || 'open'
+            status: report.status || 'open',
+            image_urls: report.image_urls || []
         });
 
         // Set up real-time subscription
