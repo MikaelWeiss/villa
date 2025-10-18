@@ -6,6 +6,7 @@ import NewTicketModal from "../../components/NewTicketModal";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { Wrench, House, CreditCard } from "lucide-react";
 
 function TenantDashboard() {
     const [isOpen, setIsOpen] = useState(false);
@@ -40,19 +41,19 @@ function TenantDashboard() {
             {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="home">🏠</span>,
+                icon: <House size={20} />,
                 path: "/tenant/dashboard",
             },
             {
                 name: "Payments",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="card">💳</span>,
+                icon: <CreditCard size={20} />,
                 path: "/tenant/payments",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="wrench">🔧</span>,
+                icon: <Wrench size={20} />,
                 path: "/tenant/reports"
             }
         ]}
@@ -106,7 +107,7 @@ function TenantDashboard() {
                 </div>
                 <div className={styles.cardContainer}>
                     <TenantPreviewCard
-                        icon={<span style={{ fontSize: 100 }} role="img" aria-label="card">💳</span>}
+                        icon={<CreditCard size={130} />}
                         infoComponent={balanceContent}
                         buttons={[
                             { link: "#", text: "Pay Now" },
