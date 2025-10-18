@@ -1,76 +1,75 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../../authentication';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
-import styles from "./ManagerMaintenanceList.module.css";
+import styles from "./Reports.module.css";
 import ManagerMaintenanceList from "../../components/ManagerMaintenanceList";
 import { Wrench, LayoutDashboard, Users } from "lucide-react";
-import { useAuth } from '../../authentication';
+import { useAuth } from '../../contexts/AuthContext';
 
 function ManagerMaintenanceListPage() {
-    const { signOutUser } = useAuth();
+    const { signOut } = useAuth();
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const nav =
-        (<Nav navElements={[
+    const nav = (
+        <Nav navElements={[
             {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
                 icon: <LayoutDashboard size={20} />,
-                path: "/managerDashboard",
+                path: "/manager/dashboard",
             },
             {
                 name: "Tenants",
                 id: crypto.randomUUID(),
                 icon: <Users size={20} />,
-                path: "/managerTenants",
+                path: "/manager/tenants",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
                 icon: <Wrench size={20} />,
-                path: "/managerMaintenance"
+                path: "/manager/reports"
             }
         ]}
         />)
 
+    const fetchReports = useCallback(async () => {
+        try {
+            const { data, error: fetchError } = await supabase
+                .from('reports')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (fetchError) throw fetchError;
+
+            const fetchedTickets = data.map(report => ({
+                id: report.id,
+                title: report.description?.substring(0, 50) + '...' || 'No title',
+                date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'Unknown date',
+                severity: report.severity || 'medium',
+                description: report.description || 'No description',
+                tenantName: report.tenant_name || 'Unknown tenant',
+                property: report.unit || 'Unknown unit',
+                unit: report.unit,
+                status: report.status || 'open'
+            }));
+
+            setTickets(fetchedTickets);
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching maintenance requests:', err);
+            setError('Failed to load maintenance requests');
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        // Initial fetch
-        const fetchReports = async () => {
-            try {
-                const { data, error: fetchError } = await supabase
-                    .from('reports')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (fetchError) throw fetchError;
-
-                const fetchedTickets = data.map(report => ({
-                    id: report.id,
-                    title: report.description?.substring(0, 50) + '...' || 'No title',
-                    date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                    }) : 'Unknown date',
-                    severity: report.severity || 'medium',
-                    description: report.description || 'No description',
-                    tenantName: report.tenant_name || 'Unknown tenant',
-                    property: report.unit || 'Unknown unit',
-                    unit: report.unit,
-                    status: report.status || 'open'
-                }));
-
-                setTickets(fetchedTickets);
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching maintenance requests:', err);
-                setError('Failed to load maintenance requests');
-                setLoading(false);
-            }
-        };
-
         fetchReports();
 
         // Helper function to transform report to ticket format
@@ -138,7 +137,7 @@ function ManagerMaintenanceListPage() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [])
+    }, [fetchReports])
 
     if (loading) {
         return (
@@ -147,7 +146,7 @@ function ManagerMaintenanceListPage() {
                 <div className={styles.content}>
                     <div className={styles.header}>
                         <h1 className={styles.title}>All Maintenance Requests</h1>
-                        <button className={styles.signOutBtn} onClick={signOutUser}>
+                        <button className={styles.signOutBtn} onClick={signOut}>
                             Sign Out
                         </button>
                     </div>
@@ -166,7 +165,7 @@ function ManagerMaintenanceListPage() {
                 <div className={styles.content}>
                     <div className={styles.header}>
                         <h1 className={styles.title}>All Maintenance Requests</h1>
-                        <button className={styles.signOutBtn} onClick={signOutUser}>
+                        <button className={styles.signOutBtn} onClick={signOut}>
                             Sign Out
                         </button>
                     </div>
@@ -184,7 +183,7 @@ function ManagerMaintenanceListPage() {
             <div className={styles.content}>
                 <div className={styles.header}>
                     <h1 className={styles.title}>All Maintenance Requests</h1>
-                    <button className={styles.signOutBtn} onClick={signOutUser}>
+                    <button className={styles.signOutBtn} onClick={signOut}>
                         Sign Out
                     </button>
                 </div>

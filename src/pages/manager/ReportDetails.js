@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../../authentication';
-import { useAuth } from '../../authentication';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import Nav from '../../components/nav/Nav';
 import StatusSelector from '../../components/StatusSelector';
-import styles from './ManagerMaintenanceDetail.module.css';
+import styles from './ReportDetails.module.css';
 import { Wrench, House, Users } from 'lucide-react';
 
 function ManagerMaintenanceDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { signOutUser } = useAuth();
+    const { signOut } = useAuth();
     const [maintenanceRequest, setMaintenanceRequest] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -21,19 +21,19 @@ function ManagerMaintenanceDetail() {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
                 icon: <House size={20} />,
-                path: "/managerDashboard",
+                path: "/manager/dashboard",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
                 icon: <Wrench size={20} />,
-                path: "/managerMaintenance"
+                path: "/manager/reports"
             },
             {
                 name: "Tenants",
                 id: crypto.randomUUID(),
                 icon: <Users size={20} />,
-                path: "/managerTenants"
+                path: "/manager/tenants"
             }
         ]}
         />
@@ -138,7 +138,7 @@ function ManagerMaintenanceDetail() {
                         <h2>{error || 'Maintenance request not found'}</h2>
                         <button
                             className={styles.backButton}
-                            onClick={() => navigate('/managerMaintenance')}
+                            onClick={() => navigate('/manager/reports')}
                         >
                             Back to List
                         </button>
@@ -156,13 +156,13 @@ function ManagerMaintenanceDetail() {
                     <div className={styles.headerLeft}>
                         <button
                             className={styles.backButton}
-                            onClick={() => navigate('/managerMaintenance')}
+                            onClick={() => navigate('/manager/reports')}
                         >
                             ← Back
                         </button>
                         <h1 className={styles.title}>Maintenance Request Details</h1>
                     </div>
-                    <button className={styles.signOutBtn} onClick={signOutUser}>
+                    <button className={styles.signOutBtn} onClick={signOut}>
                         Sign Out
                     </button>
                 </div>

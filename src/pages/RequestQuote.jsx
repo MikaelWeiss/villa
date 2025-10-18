@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../authentication';
+import { supabase } from '../lib/supabase';
 
 export default function RequestQuote() {
   const [formState, setFormState] = React.useState({
@@ -109,5 +109,3 @@ export default function RequestQuote() {
     </div>
   );
 }
-
-

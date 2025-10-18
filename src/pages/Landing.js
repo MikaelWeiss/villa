@@ -1,7 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LandingPage() {
+  const { user, role } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -22,7 +26,16 @@ export default function LandingPage() {
           <strong style={{ fontSize: 18 }}>Villa</strong>
         </div>
         <nav style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Link to="/signin" style={{ color: '#0a0f1e', textDecoration: 'none', opacity: 0.9 }}>Sign in</Link>
+          {user ? (
+            <Link
+              to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
+              style={{ color: '#0a0f1e', textDecoration: 'none', opacity: 0.9 }}
+            >
+              Go to Dashboard
+            </Link>
+          ) : (
+            <Link to="/signin" style={{ color: '#0a0f1e', textDecoration: 'none', opacity: 0.9 }}>Sign in</Link>
+          )}
           <Link to="/quote" style={{ color: 'white', background: '#1976d2', padding: '10px 14px', borderRadius: 999, textDecoration: 'none', fontWeight: 600 }}>Request a quote</Link>
         </nav>
       </header>
@@ -35,7 +48,16 @@ export default function LandingPage() {
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 }}>
             <Link to="/quote" style={{ color: 'white', background: '#1976d2', padding: '12px 18px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>Get a free quote</Link>
-            <Link to="/signin" style={{ color: '#1976d2', padding: '12px 18px', borderRadius: 999, textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', fontWeight: 600 }}>Sign in</Link>
+            {user ? (
+              <Link
+                to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
+                style={{ color: '#1976d2', padding: '12px 18px', borderRadius: 999, textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', fontWeight: 600 }}
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link to="/signin" style={{ color: '#1976d2', padding: '12px 18px', borderRadius: 999, textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', fontWeight: 600 }}>Sign in</Link>
+            )}
           </div>
         </section>
 
@@ -75,7 +97,7 @@ export default function LandingPage() {
         <section style={{ maxWidth: 1000, margin: '56px auto 0' }}>
           <h2 style={{ fontSize: 28, margin: 0, textAlign: 'center' }}>How it works</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginTop: 16 }}>
-            {[ 
+            {[
               { step: '1', title: 'Submit', desc: 'Tenant reports an issue with photos and details in seconds.' },
               { step: '2', title: 'Triage', desc: 'Villa suggests priority and routes to the right team or vendor.' },
               { step: '3', title: 'Resolve', desc: 'Track updates, schedule work, and close the loop with proof.' },
@@ -103,12 +125,21 @@ export default function LandingPage() {
             </div>
             <div>
               <strong>How quickly can we get started?</strong>
-              <p style={{ margin: '6px 0 0', color: 'rgba(10,15,30,0.75)' }}>Most teams are up and running in under a day. We’ll guide you.</p>
+              <p style={{ margin: '6px 0 0', color: 'rgba(10,15,30,0.75)' }}>Most teams are up and running in under a day. We'll guide you.</p>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
             <Link to="/quote" style={{ color: 'white', background: '#1976d2', padding: '10px 14px', borderRadius: 999, textDecoration: 'none', fontWeight: 600 }}>Talk to us</Link>
-            <Link to="/signin" style={{ color: '#1976d2', textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', padding: '10px 14px', borderRadius: 999, fontWeight: 600 }}>Sign in</Link>
+            {user ? (
+              <Link
+                to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
+                style={{ color: '#1976d2', textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', padding: '10px 14px', borderRadius: 999, fontWeight: 600 }}
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link to="/signin" style={{ color: '#1976d2', textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', padding: '10px 14px', borderRadius: 999, fontWeight: 600 }}>Sign in</Link>
+            )}
           </div>
         </section>
       </main>
@@ -117,12 +148,19 @@ export default function LandingPage() {
         <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'rgba(10,15,30,0.7)' }}>
           <span>© {new Date().getFullYear()} Villa</span>
           <div style={{ display: 'flex', gap: 12 }}>
-            <Link to="/signin" style={{ color: '#1976d2', textDecoration: 'none' }}>Tenant/Manager sign in</Link>
+            {user ? (
+              <Link
+                to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
+                style={{ color: '#1976d2', textDecoration: 'none' }}
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link to="/signin" style={{ color: '#1976d2', textDecoration: 'none' }}>Tenant/Manager sign in</Link>
+            )}
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
-

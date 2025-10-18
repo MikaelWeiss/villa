@@ -1,12 +1,22 @@
-import { useState } from 'react';
-import { useAuth } from '../authentication';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SignInPage() {
-  const { signInWithMagicLink } = useAuth();
+  const { signInWithEmail, user, role } = useAuth();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  // Redirect authenticated users to their dashboard
+  useEffect(() => {
+    if (user && role) {
+      const redirectPath = role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard';
+      navigate(redirectPath, { replace: true });
+    }
+  }, [user, role, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,7 +24,7 @@ export default function SignInPage() {
     setError('');
 
     try {
-      await signInWithMagicLink(email);
+      await signInWithEmail(email);
       setEmailSent(true);
     } catch (err) {
       setError(err.message || 'Failed to send magic link');
@@ -22,6 +32,11 @@ export default function SignInPage() {
       setLoading(false);
     }
   };
+
+  // Don't render the form if user is authenticated
+  if (user) {
+    return null;
+  }
 
   if (emailSent) {
     return (

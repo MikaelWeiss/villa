@@ -14,7 +14,7 @@ function TenantMaintenanceList({ tickets }) {
             </ul>
         </div>
     )
-    
+
     function Ticket({ ticket }) {
         return (
             <div className={styles.ticketContainer}>

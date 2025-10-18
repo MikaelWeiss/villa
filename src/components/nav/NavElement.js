@@ -9,8 +9,8 @@ function NavElement({ elementInfo }) {
             </NavLink>
         </li>
     )
-    
-    
+
+
 }
 
 export default NavElement;

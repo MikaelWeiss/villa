@@ -5,7 +5,8 @@ function ManagerMaintenanceList({ tickets }) {
     const navigate = useNavigate();
 
     const handleTicketClick = (ticketId) => {
-        navigate(`/managerMaintenance/${ticketId}`);
+        // Updated to match villa-two's route structure
+        navigate(`/manager/reports/${ticketId}`);
     };
 
     return (
