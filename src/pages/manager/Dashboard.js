@@ -3,7 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
 import { useAuth } from '../../contexts/AuthContext';
-import { Wrench, LayoutDashboard, Users, AlertCircle, Clock, CheckCircle, Activity } from "lucide-react";
+import {
+    Wrench,
+    LayoutDashboard,
+    Users,
+    AlertCircle,
+    Clock,
+    CheckCircle,
+    Activity,
+    TrendingUp,
+    TrendingDown,
+    ArrowRight,
+    Calendar,
+    Eye
+} from "lucide-react";
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';
@@ -115,91 +128,188 @@ function ManagerDashboard() {
             {nav}
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
-                    title="Manager Dashboard"
-                    actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    title="Dashboard"
+                    actions={
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant="outline-secondary"
+                                size="sm"
+                                leftIcon={<Calendar />}
+                            >
+                                Last 30 Days
+                            </Button>
+                            <Button variant="danger" onClick={signOut} size="sm">
+                                Sign Out
+                            </Button>
+                        </div>
+                    }
                 />
 
+                {/* Welcome Section */}
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-secondary-900 mb-2">
+                        Welcome back
+                    </h2>
+                    <p className="text-secondary-600">
+                        Here's what's happening with your properties today
+                    </p>
+                </div>
+
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                    <StatCard
-                        title="Total Reports"
-                        value={stats.total}
-                        icon={<Activity size={24} />}
-                        color="primary"
-                    />
-                    <StatCard
-                        title="Open"
-                        value={stats.open}
-                        icon={<AlertCircle size={24} />}
-                        color="error"
-                    />
-                    <StatCard
-                        title="In Progress"
-                        value={stats.inProgress}
-                        icon={<Clock size={24} />}
-                        color="warning"
-                    />
-                    <StatCard
-                        title="Resolved"
-                        value={stats.resolved}
-                        icon={<CheckCircle size={24} />}
-                        color="success"
-                    />
-                    <StatCard
-                        title="Active Tenants"
-                        value={stats.tenantCount}
-                        icon={<Users size={24} />}
-                        color="secondary"
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                                <Activity size={24} />
+                            </div>
+                            <div className="flex items-center gap-1 text-xs font-medium text-success-600">
+                                <TrendingUp size={14} />
+                                <span>12%</span>
+                            </div>
+                        </div>
+                        <p className="text-sm font-medium text-secondary-600 mb-1">Total Reports</p>
+                        <p className="text-3xl font-bold text-secondary-900">{stats.total}</p>
+                        <p className="text-xs text-secondary-500 mt-2">All time</p>
+                    </Card>
+
+                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-error-500 to-error-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                                <AlertCircle size={24} />
+                            </div>
+                            {stats.open > 0 && (
+                                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-error-50 text-error-700 text-xs font-semibold animate-pulse-subtle">
+                                    Needs attention
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-sm font-medium text-secondary-600 mb-1">Open</p>
+                        <p className="text-3xl font-bold text-secondary-900">{stats.open}</p>
+                        <p className="text-xs text-secondary-500 mt-2">Requires action</p>
+                    </Card>
+
+                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-warning-500 to-warning-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                                <Clock size={24} />
+                            </div>
+                        </div>
+                        <p className="text-sm font-medium text-secondary-600 mb-1">In Progress</p>
+                        <p className="text-3xl font-bold text-secondary-900">{stats.inProgress}</p>
+                        <p className="text-xs text-secondary-500 mt-2">Being resolved</p>
+                    </Card>
+
+                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                                <CheckCircle size={24} />
+                            </div>
+                            <div className="flex items-center gap-1 text-xs font-medium text-success-600">
+                                <TrendingUp size={14} />
+                                <span>8%</span>
+                            </div>
+                        </div>
+                        <p className="text-sm font-medium text-secondary-600 mb-1">Resolved</p>
+                        <p className="text-3xl font-bold text-secondary-900">{stats.resolved}</p>
+                        <p className="text-xs text-secondary-500 mt-2">This month</p>
+                    </Card>
+
+                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                                <Users size={24} />
+                            </div>
+                        </div>
+                        <p className="text-sm font-medium text-secondary-600 mb-1">Active Tenants</p>
+                        <p className="text-3xl font-bold text-secondary-900">{stats.tenantCount}</p>
+                        <p className="text-xs text-secondary-500 mt-2">With reports</p>
+                    </Card>
                 </div>
 
                 {/* Recent Activity */}
-                <Card>
-                    <Card.Header>
-                        <Card.Title>Recent Activity</Card.Title>
+                <Card variant="elevated">
+                    <Card.Header withBorder>
+                        <div className="flex items-center justify-between">
+                            <Card.Title subtitle="Recent maintenance requests">
+                                Recent Activity
+                            </Card.Title>
+                            <Button
+                                variant="ghost-secondary"
+                                size="sm"
+                                rightIcon={<ArrowRight />}
+                                onClick={() => navigate('/manager/reports')}
+                            >
+                                View All
+                            </Button>
+                        </div>
                     </Card.Header>
                     <Card.Content>
                         {recentReports.length === 0 ? (
-                            <p className="text-secondary-500">No recent reports</p>
+                            <div className="text-center py-12">
+                                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary-100 flex items-center justify-center">
+                                    <Activity size={32} className="text-secondary-400" />
+                                </div>
+                                <p className="text-secondary-600 font-medium">No recent reports</p>
+                                <p className="text-sm text-secondary-500 mt-1">New maintenance requests will appear here</p>
+                            </div>
                         ) : (
-                            <div className="flex flex-col gap-3">
-                                {recentReports.map(report => (
+                            <div className="space-y-1">
+                                {recentReports.map((report, index) => (
                                     <div
                                         key={report.id}
                                         onClick={() => navigate(`/manager/reports/${report.id}`)}
-                                        className="p-4 border border-secondary-200 rounded-lg cursor-pointer transition-all hover:bg-secondary-50 hover:border-secondary-300"
+                                        className="group p-4 -mx-2 rounded-xl cursor-pointer transition-all duration-300 hover:bg-secondary-50 hover:shadow-sm animate-fade-in-up"
+                                        style={{animationDelay: `${index * 0.05}s`}}
                                     >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="flex-1">
-                                                <p className="text-sm font-semibold text-secondary-800 mb-1">
-                                                    {report.description}
-                                                </p>
-                                                <p className="text-sm text-secondary-600">
-                                                    {report.tenant} - Unit {report.unit}
-                                                </p>
+                                        <div className="flex items-start gap-4">
+                                            {/* Icon */}
+                                            <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
+                                                report.severity === 'urgent' ? 'bg-error-100 text-error-600' :
+                                                report.severity === 'high' ? 'bg-warning-100 text-warning-600' :
+                                                'bg-primary-100 text-primary-600'
+                                            }`}>
+                                                <AlertCircle size={20} />
                                             </div>
-                                            <span className="text-xs text-secondary-500 ml-3">
-                                                {report.date}
-                                            </span>
-                                        </div>
-                                        <div className="flex gap-2 items-center">
-                                            <Badge variant={report.status}>
-                                                {report.status}
-                                            </Badge>
-                                            <Badge variant={report.severity}>
-                                                {report.severity}
-                                            </Badge>
+
+                                            {/* Content */}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-start justify-between gap-4 mb-2">
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-secondary-900 mb-1 group-hover:text-primary-600 transition-colors truncate">
+                                                            {report.description}
+                                                        </p>
+                                                        <div className="flex items-center gap-2 text-xs text-secondary-600">
+                                                            <span className="font-medium">{report.tenant}</span>
+                                                            <span className="text-secondary-400">•</span>
+                                                            <span>Unit {report.unit}</span>
+                                                            <span className="text-secondary-400">•</span>
+                                                            <span>{report.date}</span>
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        variant="ghost-secondary"
+                                                        size="xs"
+                                                        leftIcon={<Eye />}
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                                                    >
+                                                        View
+                                                    </Button>
+                                                </div>
+                                                <div className="flex gap-2 items-center">
+                                                    <Badge variant={report.status}>
+                                                        {report.status}
+                                                    </Badge>
+                                                    <Badge variant={report.severity}>
+                                                        {report.severity}
+                                                    </Badge>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </Card.Content>
-                    <Card.Footer>
-                        <Button onClick={() => navigate('/manager/reports')}>
-                            View All Reports →
-                        </Button>
-                    </Card.Footer>
                 </Card>
             </div>
         </div>
