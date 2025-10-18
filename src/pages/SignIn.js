@@ -12,6 +12,7 @@ export default function SignInPage() {
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {
+    document.title = 'Sign In - Villa';
     if (user && role) {
       const redirectPath = role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard';
       navigate(redirectPath, { replace: true });

@@ -75,13 +75,13 @@ function ManagerTenantsPage() {
             setTenants(formattedTenants);
             setLoading(false);
         } catch (err) {
-            console.error('Error fetching tenants:', err);
             setError('Failed to load tenants');
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
+        document.title = 'Tenants - Villa';
         fetchTenants();
 
         // Set up real-time subscription to refresh when reports change

@@ -6,6 +6,10 @@ export default function LandingPage() {
   const { user, role } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.title = 'Villa - Apartment Maintenance Made Simple';
+  }, []);
+
   return (
     <div style={{
       minHeight: '100vh',

@@ -70,7 +70,6 @@ function ManagerMaintenanceDetail() {
                 setError('Maintenance request not found');
             }
         } catch (err) {
-            console.error('Error fetching maintenance request:', err);
             setError('Failed to load maintenance request');
         } finally {
             setLoading(false);
@@ -78,6 +77,7 @@ function ManagerMaintenanceDetail() {
     }, [id]);
 
     useEffect(() => {
+        document.title = 'Report Details - Villa';
         fetchMaintenanceRequest();
     }, [fetchMaintenanceRequest]);
 
@@ -99,7 +99,6 @@ function ManagerMaintenanceDetail() {
                 updatedAt: new Date().toISOString()
             }));
         } catch (err) {
-            console.error('Error updating status:', err);
             throw err;
         }
     };

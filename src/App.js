@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages
 import Landing from './pages/Landing';
@@ -33,13 +34,14 @@ function RootRedirect() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/quote" element={<RequestQuote />} />
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<RootRedirect />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/quote" element={<RequestQuote />} />
 
           {/* Tenant Routes */}
           <Route
@@ -106,6 +108,7 @@ function App() {
         </Routes>
       </AuthProvider>
     </Router>
+    </ErrorBoundary>
   );
 }
 

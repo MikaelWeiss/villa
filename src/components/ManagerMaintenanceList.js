@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './ManagerMaintenanceList.module.css';
+import { Inbox } from 'lucide-react';
 
 function ManagerMaintenanceList({ tickets }) {
     const navigate = useNavigate();
@@ -8,6 +9,27 @@ function ManagerMaintenanceList({ tickets }) {
         // Updated to match villa-two's route structure
         navigate(`/manager/reports/${ticketId}`);
     };
+
+    if (tickets.length === 0) {
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '60px 20px',
+                color: '#9ca3af'
+            }}>
+                <Inbox size={64} style={{ marginBottom: '16px', opacity: 0.3 }} />
+                <p style={{ margin: '0', fontSize: '18px', fontWeight: '500', color: '#6b7280' }}>
+                    No maintenance requests found
+                </p>
+                <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>
+                    All maintenance requests from tenants will appear here
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div>

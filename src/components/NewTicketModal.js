@@ -130,7 +130,8 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                     .eq('id', reportId);
 
                 if (updateError) {
-                    console.error('Warning: Report created but image URLs not saved:', updateError);
+                    // Report created but image URLs not saved
+                    // Continue since main report was created successfully
                 }
             }
 
@@ -143,7 +144,6 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
             setIsOpen(false);
         } catch (err) {
             setError(err.message || 'Failed to create report. Please try again.');
-            console.error('Error creating report:', err);
         } finally {
             setLoading(false);
         }

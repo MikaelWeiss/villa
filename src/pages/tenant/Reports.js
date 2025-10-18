@@ -4,6 +4,7 @@ import TenantMaintenanceList from "../../components/TenantMaintenanceList";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { House, CreditCard, Wrench } from 'lucide-react';
 
 function TenantReports() {
     const { signOut, user } = useAuth();
@@ -22,13 +23,14 @@ function TenantReports() {
             if (error) throw error;
             setReports(data || []);
         } catch (error) {
-            console.error('Error fetching reports:', error);
+            // Error fetching reports - fail silently and show empty state
         } finally {
             setLoading(false);
         }
     }, [user]);
 
     useEffect(() => {
+        document.title = 'Maintenance - Villa';
         fetchReports();
     }, [fetchReports]);
 
@@ -37,19 +39,19 @@ function TenantReports() {
             {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="home">🏠</span>,
+                icon: <House size={20} />,
                 path: "/tenant/dashboard",
             },
             {
                 name: "Payments",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="card">💳</span>,
+                icon: <CreditCard size={20} />,
                 path: "/tenant/payments",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="wrench">🔧</span>,
+                icon: <Wrench size={20} />,
                 path: "/tenant/reports"
             }
         ]}

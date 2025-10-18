@@ -64,13 +64,13 @@ function ManagerMaintenanceListPage() {
             setTickets(fetchedTickets);
             setLoading(false);
         } catch (err) {
-            console.error('Error fetching maintenance requests:', err);
             setError('Failed to load maintenance requests');
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
+        document.title = 'Maintenance Reports - Villa';
         fetchReports();
 
         // Helper function to transform report to ticket format
@@ -102,7 +102,6 @@ function ManagerMaintenanceListPage() {
                     table: 'reports'
                 },
                 (payload) => {
-                    console.log('Report inserted:', payload.new);
                     const newTicket = transformReportToTicket(payload.new);
                     setTickets(prev => [newTicket, ...prev]);
                 }
@@ -115,7 +114,6 @@ function ManagerMaintenanceListPage() {
                     table: 'reports'
                 },
                 (payload) => {
-                    console.log('Report updated:', payload.new);
                     const updatedTicket = transformReportToTicket(payload.new);
                     setTickets(prev => prev.map(ticket =>
                         ticket.id === updatedTicket.id ? updatedTicket : ticket
@@ -130,7 +128,6 @@ function ManagerMaintenanceListPage() {
                     table: 'reports'
                 },
                 (payload) => {
-                    console.log('Report deleted:', payload.old);
                     setTickets(prev => prev.filter(ticket => ticket.id !== payload.old.id));
                 }
             )

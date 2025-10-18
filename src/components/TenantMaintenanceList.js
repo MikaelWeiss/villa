@@ -1,7 +1,28 @@
 import styles from './TenantMaintenanceList.module.css';
-import ButtonLink from "./ButtonLink";
+import { Wrench } from 'lucide-react';
 
 function TenantMaintenanceList({ tickets }) {
+    if (tickets.length === 0) {
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '60px 20px',
+                color: '#9ca3af'
+            }}>
+                <Wrench size={64} style={{ marginBottom: '16px', opacity: 0.3 }} />
+                <p style={{ margin: '0', fontSize: '18px', fontWeight: '500', color: '#6b7280' }}>
+                    No maintenance requests yet
+                </p>
+                <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>
+                    Click "New Request" to submit your first maintenance request
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div>
             <ul className={styles.ul}>

@@ -26,13 +26,14 @@ function TenantDashboard() {
             if (error) throw error;
             setReports(data || []);
         } catch (error) {
-            console.error('Error fetching reports:', error);
+            // Error fetching reports - fail silently and show empty state
         } finally {
             setLoading(false);
         }
     }, [user]);
 
     useEffect(() => {
+        document.title = 'Dashboard - Villa';
         fetchReports();
     }, [fetchReports]);
 
@@ -111,8 +112,8 @@ function TenantDashboard() {
                         icon={<CreditCard size={130} />}
                         infoComponent={balanceContent}
                         buttons={[
-                            { link: "#", text: "Pay Now" },
-                            { link: "#", text: "History" }
+                            { link: "/tenant/payments", text: "Pay Now" },
+                            { link: "/tenant/payments", text: "History" }
                         ]}
 
                     />

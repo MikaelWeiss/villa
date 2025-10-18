@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export default function RequestQuote() {
+  React.useEffect(() => {
+    document.title = 'Request a Quote - Villa';
+  }, []);
+
   const [formState, setFormState] = React.useState({
     name: '',
     email: '',
@@ -37,7 +41,6 @@ export default function RequestQuote() {
       setFormState({ name: '', email: '', phone: '', portfolioSize: '', message: '' });
     } catch (err) {
       setError('Something went wrong. Please try again.');
-      console.error(err);
     } finally {
       setSubmitting(false);
     }
