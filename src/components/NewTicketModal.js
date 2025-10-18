@@ -8,7 +8,7 @@ function NewTicketModal({ setIsOpen}) {
                     <label htmlFor="unit">Unit Number</label>
                     <input id="unit"
                         placeholder="e.g., A-203, B-105"
-                        required="" 
+                        required=""
                         type="text"/>
                 </div>
 
@@ -20,27 +20,27 @@ function NewTicketModal({ setIsOpen}) {
                         rows="4"
                         required="" />
                 </div>
-                
+
                 <div className={styles.formGroup}>
                     <label htmlFor="description">Damage Description</label>
                     <textarea
-                    id="description" 
-                    placeholder="Please describe the damage in detail..." 
-                    rows="4" 
+                    id="description"
+                    placeholder="Please describe the damage in detail..."
+                    rows="4"
                     required="" />
                 </div>
-                
+
                 <div className={styles.formActions}>
-                    <button 
+                    <button
                         onClick={() => setIsOpen(false)}
-                        type="button" 
+                        type="button"
                         className={styles.cancel}>
                         Cancel
                     </button>
-                    <button 
+                    <button
                         onClick={() => setIsOpen(false)}
-                        type="submit" 
-                        className={styles.submit} 
+                        type="submit"
+                        className={styles.submit}
                         disabled="">
                         Submit Report
                     </button>

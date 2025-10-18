@@ -7,8 +7,8 @@ function TenantPreviewCard({ icon, infoComponent, buttons}) {
             {infoComponent}
             <div className={styles.buttonContainer}>
                 {buttons.map((button) => (
-                    <ButtonLink 
-                        link={button.link} 
+                    <ButtonLink
+                        link={button.link}
                         text={button.text}
                         key={crypto.randomUUID()}
                     />

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { db } from '../authentication';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '../lib/supabase';
 
 export default function RequestQuote() {
   const [formState, setFormState] = React.useState({
@@ -20,13 +19,20 @@ export default function RequestQuote() {
     setSubmitting(true);
     setError('');
     try {
-      const payload = {
-        ...formState,
-        createdAt: serverTimestamp(),
-        status: 'new',
-        source: 'website',
-      };
-      await addDoc(collection(db, 'quotes'), payload);
+      const { error: insertError } = await supabase
+        .from('quotes')
+        .insert({
+          name: formState.name,
+          email: formState.email,
+          phone: formState.phone,
+          portfolio_size: formState.portfolioSize,
+          message: formState.message,
+          status: 'new',
+          source: 'website',
+        });
+
+      if (insertError) throw insertError;
+
       setSubmitted(true);
       setFormState({ name: '', email: '', phone: '', portfolioSize: '', message: '' });
     } catch (err) {
@@ -103,5 +109,3 @@ export default function RequestQuote() {
     </div>
   );
 }
-
-

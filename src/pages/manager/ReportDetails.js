@@ -1,17 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../authentication/firebase';
-import { useAuth } from '../../authentication';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import Nav from '../../components/nav/Nav';
 import StatusSelector from '../../components/StatusSelector';
-import styles from './ManagerMaintenanceDetail.module.css';
+import styles from './ReportDetails.module.css';
 import { Wrench, House, Users } from 'lucide-react';
 
 function ManagerMaintenanceDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { signOutUser } = useAuth();
+    const { signOut } = useAuth();
     const [maintenanceRequest, setMaintenanceRequest] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,19 +21,19 @@ function ManagerMaintenanceDetail() {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
                 icon: <House size={20} />,
-                path: "/managerDashboard",
+                path: "/manager/dashboard",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
                 icon: <Wrench size={20} />,
-                path: "/managerMaintenance"
+                path: "/manager/reports"
             },
             {
                 name: "Tenants",
                 id: crypto.randomUUID(),
                 icon: <Users size={20} />,
-                path: "/managerTenants"
+                path: "/manager/tenants"
             }
         ]}
         />
@@ -43,16 +42,20 @@ function ManagerMaintenanceDetail() {
     const fetchMaintenanceRequest = useCallback(async () => {
         try {
             setLoading(true);
-            const docRef = doc(db, 'reports', id);
-            const docSnap = await getDoc(docRef);
+            const { data, error: fetchError } = await supabase
+                .from('reports')
+                .select('*')
+                .eq('id', id)
+                .single();
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
+            if (fetchError) throw fetchError;
+
+            if (data) {
                 setMaintenanceRequest({
-                    id: docSnap.id,
+                    id: data.id,
                     title: data.description?.substring(0, 50) + '...' || 'Maintenance Request',
                     description: data.description || 'No description',
-                    date: data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString('en-US', {
+                    date: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
@@ -60,7 +63,7 @@ function ManagerMaintenanceDetail() {
                     severity: data.severity || 'medium',
                     status: data.status || 'open',
                     unitNumber: data.unit,
-                    updatedAt: data.updatedAt || data.createdAt?.toDate().toISOString()
+                    updatedAt: data.updated_at || data.created_at
                 });
             } else {
                 setError('Maintenance request not found');
@@ -79,11 +82,15 @@ function ManagerMaintenanceDetail() {
 
     const handleStatusChange = async (newStatus) => {
         try {
-            const docRef = doc(db, 'reports', id);
-            await updateDoc(docRef, {
-                status: newStatus,
-                updatedAt: new Date().toISOString()
-            });
+            const { error: updateError } = await supabase
+                .from('reports')
+                .update({
+                    status: newStatus,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', id);
+
+            if (updateError) throw updateError;
 
             setMaintenanceRequest(prev => ({
                 ...prev,
@@ -131,7 +138,7 @@ function ManagerMaintenanceDetail() {
                         <h2>{error || 'Maintenance request not found'}</h2>
                         <button
                             className={styles.backButton}
-                            onClick={() => navigate('/managerMaintenance')}
+                            onClick={() => navigate('/manager/reports')}
                         >
                             Back to List
                         </button>
@@ -149,13 +156,13 @@ function ManagerMaintenanceDetail() {
                     <div className={styles.headerLeft}>
                         <button
                             className={styles.backButton}
-                            onClick={() => navigate('/managerMaintenance')}
+                            onClick={() => navigate('/manager/reports')}
                         >
                             ← Back
                         </button>
                         <h1 className={styles.title}>Maintenance Request Details</h1>
                     </div>
-                    <button className={styles.signOutBtn} onClick={signOutUser}>
+                    <button className={styles.signOutBtn} onClick={signOut}>
                         Sign Out
                     </button>
                 </div>
