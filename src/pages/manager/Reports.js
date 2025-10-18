@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
-import styles from "./Reports.module.css";
 import ManagerMaintenanceList from "../../components/ManagerMaintenanceList";
 import { Wrench, LayoutDashboard, Users } from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
+import Button from '../../components/ui/Button';
+import PageHeader from '../../components/ui/PageHeader';
+import EmptyState from '../../components/ui/EmptyState';
 
 function ManagerMaintenanceListPage() {
     const { signOut } = useAuth();
@@ -57,19 +59,20 @@ function ManagerMaintenanceListPage() {
                 tenantName: report.tenant_name || 'Unknown tenant',
                 property: report.unit || 'Unknown unit',
                 unit: report.unit,
-                status: report.status || 'open'
+                status: report.status || 'open',
+                image_urls: report.image_urls || []
             }));
 
             setTickets(fetchedTickets);
             setLoading(false);
         } catch (err) {
-            console.error('Error fetching maintenance requests:', err);
             setError('Failed to load maintenance requests');
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
+        document.title = 'Maintenance Reports - Villa';
         fetchReports();
 
         // Helper function to transform report to ticket format
@@ -86,7 +89,8 @@ function ManagerMaintenanceListPage() {
             tenantName: report.tenant_name || 'Unknown tenant',
             property: report.unit || 'Unknown unit',
             unit: report.unit,
-            status: report.status || 'open'
+            status: report.status || 'open',
+            image_urls: report.image_urls || []
         });
 
         // Set up real-time subscription
@@ -100,7 +104,6 @@ function ManagerMaintenanceListPage() {
                     table: 'reports'
                 },
                 (payload) => {
-                    console.log('Report inserted:', payload.new);
                     const newTicket = transformReportToTicket(payload.new);
                     setTickets(prev => [newTicket, ...prev]);
                 }
@@ -113,7 +116,6 @@ function ManagerMaintenanceListPage() {
                     table: 'reports'
                 },
                 (payload) => {
-                    console.log('Report updated:', payload.new);
                     const updatedTicket = transformReportToTicket(payload.new);
                     setTickets(prev => prev.map(ticket =>
                         ticket.id === updatedTicket.id ? updatedTicket : ticket
@@ -128,7 +130,6 @@ function ManagerMaintenanceListPage() {
                     table: 'reports'
                 },
                 (payload) => {
-                    console.log('Report deleted:', payload.old);
                     setTickets(prev => prev.filter(ticket => ticket.id !== payload.old.id));
                 }
             )
@@ -141,18 +142,14 @@ function ManagerMaintenanceListPage() {
 
     if (loading) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.header}>
-                        <h1 className={styles.title}>All Maintenance Requests</h1>
-                        <button className={styles.signOutBtn} onClick={signOut}>
-                            Sign Out
-                        </button>
-                    </div>
-                    <div className={styles.maintenanceContainer}>
-                        <p>Loading maintenance requests...</p>
-                    </div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <PageHeader
+                        title="All Maintenance Requests"
+                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    />
+                    <p className="text-secondary-600">Loading maintenance requests...</p>
                 </div>
             </div>
         )
@@ -160,40 +157,36 @@ function ManagerMaintenanceListPage() {
 
     if (error) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.header}>
-                        <h1 className={styles.title}>All Maintenance Requests</h1>
-                        <button className={styles.signOutBtn} onClick={signOut}>
-                            Sign Out
-                        </button>
-                    </div>
-                    <div className={styles.maintenanceContainer}>
-                        <p style={{ color: 'red' }}>{error}</p>
-                    </div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <PageHeader
+                        title="All Maintenance Requests"
+                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                    />
+                    <p className="text-error-600">{error}</p>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className={styles.container}>
+        <div className="flex min-h-screen">
             {nav}
-            <div className={styles.content}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>All Maintenance Requests</h1>
-                    <button className={styles.signOutBtn} onClick={signOut}>
-                        Sign Out
-                    </button>
-                </div>
-                <div className={styles.maintenanceContainer}>
-                    {tickets.length === 0 ? (
-                        <p>No maintenance requests found.</p>
-                    ) : (
-                        <ManagerMaintenanceList tickets={tickets} />
-                    )}
-                </div>
+            <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                <PageHeader
+                    title="All Maintenance Requests"
+                    actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
+                />
+                {tickets.length === 0 ? (
+                    <EmptyState
+                        icon={<Wrench size={48} />}
+                        title="No maintenance requests"
+                        description="There are no maintenance requests at this time."
+                    />
+                ) : (
+                    <ManagerMaintenanceList tickets={tickets} />
+                )}
             </div>
         </div>
     )

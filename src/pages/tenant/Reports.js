@@ -1,9 +1,11 @@
 import Nav from '../../components/nav/Nav.js';
-import styles from "./Dashboard.module.css";
 import TenantMaintenanceList from "../../components/TenantMaintenanceList";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { House, CreditCard, Wrench } from 'lucide-react';
+import Button from '../../components/ui/Button';
+import PageHeader from '../../components/ui/PageHeader';
 
 function TenantReports() {
     const { signOut, user } = useAuth();
@@ -22,13 +24,14 @@ function TenantReports() {
             if (error) throw error;
             setReports(data || []);
         } catch (error) {
-            console.error('Error fetching reports:', error);
+            // Error fetching reports - fail silently and show empty state
         } finally {
             setLoading(false);
         }
     }, [user]);
 
     useEffect(() => {
+        document.title = 'Maintenance - Villa';
         fetchReports();
     }, [fetchReports]);
 
@@ -37,19 +40,19 @@ function TenantReports() {
             {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="home">🏠</span>,
+                icon: <House size={20} />,
                 path: "/tenant/dashboard",
             },
             {
                 name: "Payments",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="card">💳</span>,
+                icon: <CreditCard size={20} />,
                 path: "/tenant/payments",
             },
             {
                 name: "Maintenance",
                 id: crypto.randomUUID(),
-                icon: <span role="img" aria-label="wrench">🔧</span>,
+                icon: <Wrench size={20} />,
                 path: "/tenant/reports"
             }
         ]}
@@ -65,17 +68,19 @@ function TenantReports() {
     }));
 
     return (
-        <div className={styles.container}>
+        <div className="flex">
             {nav}
-            <div className={styles.content}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Maintenance</h1>
-                    <button className={styles.signOutBtn} onClick={signOut}>
-                        Sign Out
-                    </button>
-                </div>
+            <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                <PageHeader
+                    title="Maintenance"
+                    actions={
+                        <Button variant="danger" onClick={signOut}>
+                            Sign Out
+                        </Button>
+                    }
+                />
                 {loading ? (
-                    <p>Loading...</p>
+                    <p className="text-secondary-500">Loading...</p>
                 ) : (
                     <TenantMaintenanceList tickets={formattedTickets} />
                 )}

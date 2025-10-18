@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages
 import Landing from './pages/Landing';
@@ -11,6 +12,7 @@ import TenantReports from './pages/tenant/Reports';
 import TenantPayments from './pages/tenant/Payments';
 import ManagerDashboard from './pages/manager/Dashboard';
 import ManagerReports from './pages/manager/Reports';
+import ManagerTenants from './pages/manager/Tenants';
 import ReportDetails from './pages/manager/ReportDetails';
 
 // Component to handle role-based redirect from root
@@ -32,13 +34,14 @@ function RootRedirect() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/quote" element={<RequestQuote />} />
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<RootRedirect />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/quote" element={<RequestQuote />} />
 
           {/* Tenant Routes */}
           <Route
@@ -76,6 +79,14 @@ function App() {
             }
           />
           <Route
+            path="/manager/tenants"
+            element={
+              <ProtectedRoute requireRole="manager">
+                <ManagerTenants />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/manager/reports"
             element={
               <ProtectedRoute requireRole="manager">
@@ -97,6 +108,7 @@ function App() {
         </Routes>
       </AuthProvider>
     </Router>
+    </ErrorBoundary>
   );
 }
 
