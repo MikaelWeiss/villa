@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { Wrench, Download, Plus, Clock } from 'lucide-react';
-
+import Header from '../../components/managercomponents/Header';
+import BalanceCard from '../../components/managercomponents/BalanceCard';
+import ActionButtons from '../../components/managercomponents/ActionButtons';
+import ReportsSection from '../../components/managercomponents/ReportsSection';
+import MaterialRequestForm from '../../components/managercomponents/MaterialRequestForm';
+import NewReportForm from '../../components/managercomponents/NewReportForm';
+import Sidebar from '../../components/managercomponents/Sidebar';
+import styles from './ManagerDashboard.module.css';
 // Main Dashboard Component
 export default function ManagerDashboard() {
   const [showAllReports, setShowAllReports] = useState(false);
@@ -85,12 +92,13 @@ export default function ManagerDashboard() {
     }
   };
 
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className={styles.container}>
       <Sidebar />
 
-      <div className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className={styles.mainContent}>
+        <div className={styles.contentWrapper}>
           <Header />
           <BalanceCard />
           

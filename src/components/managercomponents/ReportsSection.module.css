@@ -1,0 +1,76 @@
+.section {
+  margin-top: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background-color: #fef3c7;
+  color: #92400e;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+}
+
+.badgeIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.reportsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buttonContainer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.btn {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.seeMoreBtn {
+  background-color: #2563eb;
+  color: white;
+}
+
+.seeMoreBtn:hover {
+  background-color: #1d4ed8;
+}
+
+.showLessBtn {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.showLessBtn:hover {
+  background-color: #d1d5db;
+}

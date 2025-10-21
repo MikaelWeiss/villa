@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { Wrench, Download, Plus, Clock } from 'lucide-react';// Sidebar Component
-const Sidebar = () => {
+import SidebarItem from './SidebarItem';
+import styles from './Sidebar.module.css';
+
+function Sidebar() {
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-6">
-      <div className="space-y-2">
+    <div className={styles.sidebar}>
+      <div className={styles.nav}>
         <SidebarItem active icon="home" label="Dashboard" />
         <SidebarItem icon="payment" label="Payments" />
         <SidebarItem icon="wrench" label="Maintenance" />
       </div>
     </div>
   );
-};
+
+}
+
+export default Sidebar;

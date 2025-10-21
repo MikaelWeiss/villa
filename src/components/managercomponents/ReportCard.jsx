@@ -1,27 +1,31 @@
 import React, { useState } from 'react';
 import { Wrench, Download, Plus, Clock } from 'lucide-react';
+import styles from './ReportCard.module.css';
+
 
 // Report Card Component
-const ReportCard = ({ report }) => {
+function ReportCard({ report }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <h3 className="text-2xl font-semibold text-gray-900">{report.title}</h3>
+    <div className={styles.card}>
+      <div className={styles.header}>
+        <div className={styles.titleRow}>
+          <h3 className={styles.title}>{report.title}</h3>
           {report.urgent && (
-            <span className="px-3 py-1 bg-blue-600 text-white text-sm rounded-full">
+            <span className={`${styles.badge} ${styles.urgentBadge}`}>
               urgent
             </span>
           )}
           {report.isNew && (
-            <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+            <span className={`${styles.badge} ${styles.newBadge}`}>
               New
             </span>
           )}
         </div>
       </div>
-      <p className="text-sm text-gray-600 mb-3">{report.date}</p>
-      <p className="text-gray-700 leading-relaxed">{report.description}</p>
+      <p className={styles.date}>{report.date}</p>
+      <p className={styles.description}>{report.description}</p>
     </div>
   );
-};
+}
+
+export default ReportCard;

@@ -1,0 +1,28 @@
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.item:hover {
+  background-color: #f9fafb;
+}
+
+.active {
+  background-color: #f3f4f6;
+  font-weight: 500;
+  color: #111827;
+}
+
+.inactive {
+  color: #6b7280;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}

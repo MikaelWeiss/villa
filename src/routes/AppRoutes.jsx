@@ -7,7 +7,7 @@ import TenantMaintenance from "../pages/tenant/TenantMaintenance";
 import ManagerMaintenanceDetail from "../pages/manager/ManagerMaintenanceDetail";
 import ManagerMaintenanceDetailMock from "../pages/manager/ManagerMaintenanceDetailMock";
 import ManagerMaintenanceList from "../pages/manager/ManagerMaintenanceList";
-import ManagerDashboard from "../pages/manager/ManagerDashboard";
+import ManagerDashboard from '../pages/manager/ManagerDashboard';
 
 function ProtectedRoute({ children }) {
   const { user, userRole, loading } = useAuth();
@@ -89,6 +89,7 @@ export default function AppRoutes() {
                   </ProtectedRoute>
               }
           />
+
           <Route
               path="/manager/maintenance/:id"
               element={
