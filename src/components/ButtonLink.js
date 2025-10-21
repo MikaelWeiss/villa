@@ -1,11 +1,10 @@
-import styles from './ButtonLink.module.css'
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import Button from './ui/Button';
+
 function ButtonLink({ text, link }) {
     return (
         <Link to={link}>
-            <button className={styles.button}>
-                {text}
-            </button>
+            <Button>{text}</Button>
         </Link>
     )
 }

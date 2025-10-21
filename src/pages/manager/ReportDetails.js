@@ -4,8 +4,11 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import Nav from '../../components/nav/Nav';
 import StatusSelector from '../../components/StatusSelector';
-import styles from './ReportDetails.module.css';
-import { Wrench, House, Users } from 'lucide-react';
+import { Wrench, House, Users, ArrowLeft } from 'lucide-react';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import PageHeader from '../../components/ui/PageHeader';
+import Badge from '../../components/ui/Badge';
 
 function ManagerMaintenanceDetail() {
     const { id } = useParams();
@@ -63,13 +66,13 @@ function ManagerMaintenanceDetail() {
                     severity: data.severity || 'medium',
                     status: data.status || 'open',
                     unitNumber: data.unit,
-                    updatedAt: data.updated_at || data.created_at
+                    updatedAt: data.updated_at || data.created_at,
+                    image_urls: data.image_urls || []
                 });
             } else {
                 setError('Maintenance request not found');
             }
         } catch (err) {
-            console.error('Error fetching maintenance request:', err);
             setError('Failed to load maintenance request');
         } finally {
             setLoading(false);
@@ -77,6 +80,7 @@ function ManagerMaintenanceDetail() {
     }, [id]);
 
     useEffect(() => {
+        document.title = 'Report Details - Villa';
         fetchMaintenanceRequest();
     }, [fetchMaintenanceRequest]);
 
@@ -98,32 +102,16 @@ function ManagerMaintenanceDetail() {
                 updatedAt: new Date().toISOString()
             }));
         } catch (err) {
-            console.error('Error updating status:', err);
             throw err;
-        }
-    };
-
-    const getSeverityColor = (severity) => {
-        switch (severity?.toLowerCase()) {
-            case 'urgent':
-                return '#f44336';
-            case 'high':
-                return '#ff9800';
-            case 'medium':
-                return '#1976d2';
-            case 'low':
-                return '#4caf50';
-            default:
-                return '#1976d2';
         }
     };
 
     if (loading) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.loading}>Loading...</div>
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <p className="text-secondary-600">Loading...</p>
                 </div>
             </div>
         );
@@ -131,17 +119,16 @@ function ManagerMaintenanceDetail() {
 
     if (error || !maintenanceRequest) {
         return (
-            <div className={styles.container}>
+            <div className="flex min-h-screen">
                 {nav}
-                <div className={styles.content}>
-                    <div className={styles.error}>
-                        <h2>{error || 'Maintenance request not found'}</h2>
-                        <button
-                            className={styles.backButton}
-                            onClick={() => navigate('/manager/reports')}
-                        >
+                <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                    <div className="flex flex-col items-center justify-center py-16">
+                        <h2 className="text-2xl font-bold text-secondary-800 mb-4">
+                            {error || 'Maintenance request not found'}
+                        </h2>
+                        <Button onClick={() => navigate('/manager/reports')}>
                             Back to List
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -149,64 +136,93 @@ function ManagerMaintenanceDetail() {
     }
 
     return (
-        <div className={styles.container}>
+        <div className="flex min-h-screen">
             {nav}
-            <div className={styles.content}>
-                <div className={styles.header}>
-                    <div className={styles.headerLeft}>
-                        <button
-                            className={styles.backButton}
-                            onClick={() => navigate('/manager/reports')}
-                        >
-                            ← Back
-                        </button>
-                        <h1 className={styles.title}>Maintenance Request Details</h1>
-                    </div>
-                    <button className={styles.signOutBtn} onClick={signOut}>
-                        Sign Out
-                    </button>
-                </div>
-
-                <div className={styles.detailsContainer}>
-                    <div className={styles.mainInfo}>
-                        <div className={styles.requestCard}>
-                            <div className={styles.requestHeader}>
-                                <h2>{maintenanceRequest.title}</h2>
-                                <span
-                                    className={styles.severity}
-                                    style={{ backgroundColor: getSeverityColor(maintenanceRequest.severity) }}
-                                >
-                                    {maintenanceRequest.severity || 'medium'}
-                                </span>
-                            </div>
-
-                            <div className={styles.metaInfo}>
-                                <div className={styles.metaItem}>
-                                    <span className={styles.metaLabel}>Date Submitted:</span>
-                                    <span className={styles.metaValue}>{maintenanceRequest.date}</span>
-                                </div>
-                                {maintenanceRequest.unitNumber && (
-                                    <div className={styles.metaItem}>
-                                        <span className={styles.metaLabel}>Unit:</span>
-                                        <span className={styles.metaValue}>{maintenanceRequest.unitNumber}</span>
-                                    </div>
-                                )}
-                                {maintenanceRequest.updatedAt && (
-                                    <div className={styles.metaItem}>
-                                        <span className={styles.metaLabel}>Last Updated:</span>
-                                        <span className={styles.metaValue}>
-                                            {new Date(maintenanceRequest.updatedAt).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className={styles.descriptionSection}>
-                                <h3>Description</h3>
-                                <p className={styles.description}>{maintenanceRequest.description}</p>
-                            </div>
+            <div className="ml-315 p-10 bg-background min-h-screen flex-1">
+                <PageHeader
+                    title="Maintenance Request Details"
+                    actions={
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant="outline"
+                                onClick={() => navigate('/manager/reports')}
+                            >
+                                <ArrowLeft size={16} className="mr-2" />
+                                Back
+                            </Button>
+                            <Button variant="danger" onClick={signOut}>
+                                Sign Out
+                            </Button>
                         </div>
+                    }
+                />
 
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2">
+                        <Card>
+                            <Card.Header>
+                                <div className="flex items-start justify-between">
+                                    <Card.Title>{maintenanceRequest.title}</Card.Title>
+                                    <Badge variant={maintenanceRequest.severity}>
+                                        {maintenanceRequest.severity || 'medium'}
+                                    </Badge>
+                                </div>
+                            </Card.Header>
+                            <Card.Content>
+                                <div className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <span className="text-sm font-medium text-secondary-500">Date Submitted:</span>
+                                            <p className="text-secondary-800">{maintenanceRequest.date}</p>
+                                        </div>
+                                        {maintenanceRequest.unitNumber && (
+                                            <div>
+                                                <span className="text-sm font-medium text-secondary-500">Unit:</span>
+                                                <p className="text-secondary-800">{maintenanceRequest.unitNumber}</p>
+                                            </div>
+                                        )}
+                                        {maintenanceRequest.updatedAt && (
+                                            <div>
+                                                <span className="text-sm font-medium text-secondary-500">Last Updated:</span>
+                                                <p className="text-secondary-800">
+                                                    {new Date(maintenanceRequest.updatedAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-secondary-800 mb-2">Description</h3>
+                                        <p className="text-secondary-700 leading-relaxed">
+                                            {maintenanceRequest.description}
+                                        </p>
+                                    </div>
+
+                                    {maintenanceRequest.image_urls && maintenanceRequest.image_urls.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-secondary-800 mb-3">Photos</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {maintenanceRequest.image_urls.map((url, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="rounded-lg overflow-hidden border border-secondary-200"
+                                                    >
+                                                        <img
+                                                            src={url}
+                                                            alt={`Report image ${index + 1}`}
+                                                            className="w-full h-auto object-cover"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </Card.Content>
+                        </Card>
+                    </div>
+
+                    <div className="lg:col-span-1">
                         <StatusSelector
                             currentStatus={maintenanceRequest.status || 'open'}
                             onStatusChange={handleStatusChange}

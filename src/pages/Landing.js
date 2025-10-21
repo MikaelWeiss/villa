@@ -1,163 +1,454 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import {
+  Building2,
+  Zap,
+  Target,
+  MessageSquare,
+  BarChart3,
+  Camera,
+  Clock,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  Shield,
+  Users,
+  Home
+} from 'lucide-react';
 
 export default function LandingPage() {
   const { user, role } = useAuth();
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = 'Villa - Modern Apartment Maintenance Management';
+  }, []);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#f5f7fa',
-      color: '#0a0f1e',
-      fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
-    }}>
-      <header style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '24px 32px',
-        borderBottom: '1px solid rgba(10,15,30,0.08)',
-        background: 'white',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/favicon-32x32.png" alt="Villa" width={28} height={28} />
-          <strong style={{ fontSize: 18 }}>Villa</strong>
+    <div className="min-h-screen bg-gradient-to-b from-white via-background to-white">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-secondary-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-md">
+                <Building2 size={20} className="text-white" />
+              </div>
+              <span className="text-xl font-bold text-secondary-900">Villa</span>
+            </div>
+            <nav className="flex items-center gap-3">
+              {user ? (
+                <Link to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}>
+                  <Button variant="ghost-secondary" size="sm">
+                    Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/signin">
+                  <Button variant="ghost-secondary" size="sm">
+                    Sign in
+                  </Button>
+                </Link>
+              )}
+              <Link to="/quote">
+                <Button size="sm" leftIcon={<Sparkles />}>
+                  Get Started
+                </Button>
+              </Link>
+            </nav>
+          </div>
         </div>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          {user ? (
-            <Link
-              to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
-              style={{ color: '#0a0f1e', textDecoration: 'none', opacity: 0.9 }}
-            >
-              Go to Dashboard
-            </Link>
-          ) : (
-            <Link to="/signin" style={{ color: '#0a0f1e', textDecoration: 'none', opacity: 0.9 }}>Sign in</Link>
-          )}
-          <Link to="/quote" style={{ color: 'white', background: '#1976d2', padding: '10px 14px', borderRadius: 999, textDecoration: 'none', fontWeight: 600 }}>Request a quote</Link>
-        </nav>
       </header>
 
-      <main style={{ padding: '56px 24px 80px' }}>
-        <section style={{ maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 44, lineHeight: 1.15, margin: 0 }}>Apartment damage reports made simple</h1>
-          <p style={{ fontSize: 18, color: 'rgba(10,15,30,0.8)', marginTop: 16 }}>
-            Capture, track, and resolve unit damage fast. Villa helps tenants submit clear reports and managers coordinate fixes without the back‑and‑forth.
+      {/* Main Content */}
+      <main className="pt-24">
+        {/* Hero Section */}
+        <section className="max-w-6xl mx-auto px-6 lg:px-8 py-20 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 text-primary-700 text-sm font-medium mb-8 animate-fade-in-down">
+            <Sparkles size={16} />
+            <span>Modern maintenance management</span>
+          </div>
+
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-secondary-900 mb-6 animate-fade-in-up tracking-tight">
+            Apartment maintenance,
+            <span className="block bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">
+              beautifully simple
+            </span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-secondary-600 max-w-3xl mx-auto mb-10 leading-relaxed animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+            Capture, track, and resolve apartment damage reports with clarity. Villa connects tenants and managers through streamlined workflows that save time and reduce friction.
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 24 }}>
-            <Link to="/quote" style={{ color: 'white', background: '#1976d2', padding: '12px 18px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>Get a free quote</Link>
-            {user ? (
-              <Link
-                to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
-                style={{ color: '#1976d2', padding: '12px 18px', borderRadius: 999, textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', fontWeight: 600 }}
-              >
-                Go to Dashboard
-              </Link>
-            ) : (
-              <Link to="/signin" style={{ color: '#1976d2', padding: '12px 18px', borderRadius: 999, textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', fontWeight: 600 }}>Sign in</Link>
-            )}
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+            <Link to="/quote">
+              <Button size="lg" leftIcon={<ArrowRight />}>
+                Request a Demo
+              </Button>
+            </Link>
+            <a href="#features">
+              <Button variant="outline-secondary" size="lg">
+                Learn More
+              </Button>
+            </a>
+          </div>
+
+          {/* Social Proof */}
+          <div className="mt-16 pt-8 border-t border-secondary-200 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+            <p className="text-sm text-secondary-500 mb-6">Trusted by property managers nationwide</p>
+            <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-2 text-secondary-400">
+                  <Building2 size={20} />
+                  <span className="text-sm font-semibold">Property Group {i}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section style={{ maxWidth: 1000, margin: '64px auto 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
-          {[
-            { title: 'Fast reporting', desc: 'Tenants log damage with photos and details in minutes.' },
-            { title: 'Smart triage', desc: 'Auto‑prioritize issues and route to the right vendor.' },
-            { title: 'Clear communication', desc: 'Keep everyone in the loop with updates and timelines.' },
-            { title: 'Track outcomes', desc: 'See status at a glance and export landlord‑ready summaries.' },
-          ].map(card => (
-            <div key={card.title} style={{ background: 'white', border: '1px solid rgba(10,15,30,0.08)', borderRadius: 12, padding: 20, boxShadow: '0 6px 16px rgba(10,15,30,0.06)' }}>
-              <h3 style={{ margin: '0 0 6px', fontSize: 18, color: '#0a0f1e' }}>{card.title}</h3>
-              <p style={{ margin: 0, color: 'rgba(10,15,30,0.75)' }}>{card.desc}</p>
-            </div>
-          ))}
+        {/* Features Grid */}
+        <section id="features" className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-4">
+              Everything you need to manage maintenance
+            </h2>
+            <p className="text-lg text-secondary-600 max-w-2xl mx-auto">
+              Built for modern property management teams who value clarity and efficiency
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: <Camera />,
+                title: 'Visual Reports',
+                desc: 'Tenants capture damage with photos and context in seconds',
+                color: 'from-primary-500 to-primary-600'
+              },
+              {
+                icon: <Target />,
+                title: 'Smart Triage',
+                desc: 'Auto-prioritize issues and route to the right team instantly',
+                color: 'from-accent-500 to-accent-600'
+              },
+              {
+                icon: <MessageSquare />,
+                title: 'Real-time Updates',
+                desc: 'Keep everyone informed with automatic status notifications',
+                color: 'from-success-500 to-success-600'
+              },
+              {
+                icon: <BarChart3 />,
+                title: 'Clear Insights',
+                desc: 'Track metrics and export reports for owners and stakeholders',
+                color: 'from-warning-500 to-warning-600'
+              },
+            ].map((feature, index) => (
+              <Card
+                key={feature.title}
+                interactive
+                variant="elevated"
+                className="group animate-fade-in-up"
+                style={{animationDelay: `${index * 0.1}s`}}
+              >
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  {React.cloneElement(feature.icon, { size: 24 })}
+                </div>
+                <h3 className="text-lg font-semibold text-secondary-900 mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-secondary-600 leading-relaxed">
+                  {feature.desc}
+                </p>
+              </Card>
+            ))}
+          </div>
         </section>
 
-        <section style={{ maxWidth: 920, margin: '56px auto 0', background: 'white', border: '1px solid rgba(10,15,30,0.08)', borderRadius: 12, padding: 24, boxShadow: '0 6px 16px rgba(10,15,30,0.06)' }}>
-          <h2 style={{ margin: 0, fontSize: 28 }}>Meet Villa</h2>
-          <p style={{ marginTop: 10, color: 'rgba(10,15,30,0.75)', lineHeight: 1.6 }}>
-            Villa is the modern, friendly way to handle apartment damage and maintenance. Tenants get a clear place to report issues with photos and context. Managers get an organized queue, smart priorities, and effortless vendor coordination. Everyone gets transparency.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 16, marginTop: 12 }}>
+        {/* For Everyone Section */}
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 py-20 bg-gradient-to-br from-primary-50 to-accent-50 rounded-3xl my-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-4">
+              Built for every stakeholder
+            </h2>
+            <p className="text-lg text-secondary-600 max-w-2xl mx-auto">
+              Villa delivers value across your entire property management ecosystem
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: 'For tenants', desc: 'Report problems from your phone and track progress in one place.' },
-              { title: 'For managers', desc: 'Stay ahead of issues, assign work quickly, and keep records tidy.' },
-              { title: 'For owners', desc: 'Reduce downtime, protect assets, and see clean summaries of work.' },
-            ].map(x => (
-              <div key={x.title} style={{ background: '#f5f7fa', border: '1px solid rgba(10,15,30,0.06)', borderRadius: 10, padding: 16 }}>
-                <strong style={{ display: 'block', marginBottom: 6 }}>{x.title}</strong>
-                <span style={{ color: 'rgba(10,15,30,0.75)' }}>{x.desc}</span>
+              {
+                icon: <Home />,
+                title: 'For Tenants',
+                desc: 'Report issues from any device with photos and context. Track progress in real-time.',
+                features: ['Mobile-friendly', 'Photo upload', 'Status tracking']
+              },
+              {
+                icon: <Shield />,
+                title: 'For Managers',
+                desc: 'Triage requests efficiently with smart prioritization and vendor coordination.',
+                features: ['Smart routing', 'Team collaboration', 'Analytics dashboard']
+              },
+              {
+                icon: <Users />,
+                title: 'For Owners',
+                desc: 'Protect your assets and maintain property value with comprehensive insights.',
+                features: ['Detailed reports', 'Cost tracking', 'Compliance ready']
+              },
+            ].map((segment, index) => (
+              <Card
+                key={segment.title}
+                variant="elevated"
+                padding="lg"
+                className="bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white mb-5">
+                  {React.cloneElement(segment.icon, { size: 28 })}
+                </div>
+                <h3 className="text-xl font-bold text-secondary-900 mb-3">
+                  {segment.title}
+                </h3>
+                <p className="text-secondary-600 mb-4 leading-relaxed">
+                  {segment.desc}
+                </p>
+                <ul className="space-y-2">
+                  {segment.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-sm text-secondary-700">
+                      <CheckCircle2 size={16} className="text-success-500 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* How It Works */}
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-4">
+              Simple workflow, powerful results
+            </h2>
+            <p className="text-lg text-secondary-600 max-w-2xl mx-auto">
+              From submission to resolution in four streamlined steps
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                step: '01',
+                icon: <Camera />,
+                title: 'Submit',
+                desc: 'Tenant captures damage with photos and details in under a minute'
+              },
+              {
+                step: '02',
+                icon: <Zap />,
+                title: 'Triage',
+                desc: 'Smart prioritization routes the request to the right team instantly'
+              },
+              {
+                step: '03',
+                icon: <Clock />,
+                title: 'Resolve',
+                desc: 'Track progress, coordinate vendors, and update stakeholders in real-time'
+              },
+              {
+                step: '04',
+                icon: <CheckCircle2 />,
+                title: 'Review',
+                desc: 'Export comprehensive reports for owners, insurance, and compliance'
+              },
+            ].map((item, index) => (
+              <div key={item.step} className="relative">
+                {index < 3 && (
+                  <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-gradient-to-r from-primary-200 to-accent-200"></div>
+                )}
+                <Card variant="elevated" padding="lg" className="relative z-10 text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 text-white text-xl font-bold mb-4 shadow-lg">
+                    {item.step}
+                  </div>
+                  <div className="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-primary-600">
+                    {React.cloneElement(item.icon, { size: 28 })}
+                  </div>
+                  <h3 className="text-lg font-bold text-secondary-900 mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-secondary-600 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </Card>
               </div>
             ))}
           </div>
         </section>
 
-        <section style={{ maxWidth: 1000, margin: '56px auto 0' }}>
-          <h2 style={{ fontSize: 28, margin: 0, textAlign: 'center' }}>How it works</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16, marginTop: 16 }}>
+        {/* FAQ Section */}
+        <section className="max-w-4xl mx-auto px-6 lg:px-8 py-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-4">
+              Common questions
+            </h2>
+            <p className="text-lg text-secondary-600">
+              Everything you need to know about Villa
+            </p>
+          </div>
+
+          <div className="space-y-4">
             {[
-              { step: '1', title: 'Submit', desc: 'Tenant reports an issue with photos and details in seconds.' },
-              { step: '2', title: 'Triage', desc: 'Villa suggests priority and routes to the right team or vendor.' },
-              { step: '3', title: 'Resolve', desc: 'Track updates, schedule work, and close the loop with proof.' },
-              { step: '4', title: 'Review', desc: 'Export summaries for owners, insurance, or compliance.' },
-            ].map(s => (
-              <div key={s.step} style={{ background: 'white', border: '1px solid rgba(10,15,30,0.08)', borderRadius: 12, padding: 18, boxShadow: '0 6px 16px rgba(10,15,30,0.06)' }}>
-                <div style={{ width: 36, height: 36, borderRadius: 999, background: '#1976d2', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{s.step}</div>
-                <h3 style={{ margin: '10px 0 6px', fontSize: 18 }}>{s.title}</h3>
-                <p style={{ margin: 0, color: 'rgba(10,15,30,0.75)' }}>{s.desc}</p>
-              </div>
+              {
+                q: 'Can Villa replace our current maintenance system?',
+                a: 'Yes. Villa provides comprehensive intake, triage, communication, and tracking capabilities. We also offer data export and API access for integration with existing systems.'
+              },
+              {
+                q: 'Do tenants need to install a mobile app?',
+                a: 'No. Villa works seamlessly in any web browser on desktop, tablet, or mobile. Tenants can submit reports instantly without downloads or installations.'
+              },
+              {
+                q: 'How quickly can we get started?',
+                a: 'Most property management teams are fully operational within 24 hours. Our onboarding process is streamlined, and our team provides personalized support to ensure a smooth transition.'
+              },
+              {
+                q: 'What about data security and privacy?',
+                a: 'Villa uses enterprise-grade encryption and complies with industry security standards. All data is encrypted in transit and at rest. We never sell or share your data with third parties.'
+              },
+            ].map((faq, index) => (
+              <Card
+                key={index}
+                variant="outline"
+                padding="lg"
+                className="hover:border-primary-200 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-secondary-900 mb-3">
+                  {faq.q}
+                </h3>
+                <p className="text-secondary-600 leading-relaxed">
+                  {faq.a}
+                </p>
+              </Card>
             ))}
           </div>
         </section>
 
-        <section style={{ maxWidth: 920, margin: '56px auto 0', background: 'white', border: '1px solid rgba(10,15,30,0.08)', borderRadius: 12, padding: 24, boxShadow: '0 6px 16px rgba(10,15,30,0.06)' }}>
-          <h2 style={{ margin: 0, fontSize: 28 }}>Frequently asked</h2>
-          <div style={{ marginTop: 12, display: 'grid', gap: 12 }}>
-            <div>
-              <strong>Can Villa replace my current maintenance tool?</strong>
-              <p style={{ margin: '6px 0 0', color: 'rgba(10,15,30,0.75)' }}>Yes. Villa covers intake, triage, communication, and tracking, and exports reports you can share with owners or systems.</p>
-            </div>
-            <div>
-              <strong>Do tenants need to install an app?</strong>
-              <p style={{ margin: '6px 0 0', color: 'rgba(10,15,30,0.75)' }}>No, they can submit from any device. We keep it simple and fast.</p>
-            </div>
-            <div>
-              <strong>How quickly can we get started?</strong>
-              <p style={{ margin: '6px 0 0', color: 'rgba(10,15,30,0.75)' }}>Most teams are up and running in under a day. We'll guide you.</p>
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-            <Link to="/quote" style={{ color: 'white', background: '#1976d2', padding: '10px 14px', borderRadius: 999, textDecoration: 'none', fontWeight: 600 }}>Talk to us</Link>
-            {user ? (
-              <Link
-                to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
-                style={{ color: '#1976d2', textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', padding: '10px 14px', borderRadius: 999, fontWeight: 600 }}
-              >
-                Go to Dashboard
+        {/* CTA Section */}
+        <section className="max-w-5xl mx-auto px-6 lg:px-8 py-20">
+          <Card
+            variant="elevated"
+            padding="xl"
+            className="bg-gradient-to-br from-primary-600 to-accent-600 text-white text-center border-none shadow-2xl"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+              Ready to simplify maintenance?
+            </h2>
+            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+              Join property managers who are transforming maintenance operations with Villa
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link to="/quote">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  leftIcon={<ArrowRight />}
+                  className="bg-white text-primary-700 hover:bg-white/90"
+                >
+                  Request a Demo
+                </Button>
               </Link>
-            ) : (
-              <Link to="/signin" style={{ color: '#1976d2', textDecoration: 'none', border: '1px solid rgba(25,118,210,0.35)', padding: '10px 14px', borderRadius: 999, fontWeight: 600 }}>Sign in</Link>
-            )}
-          </div>
+              {user ? (
+                <Link to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}>
+                  <Button
+                    size="lg"
+                    variant="outline-secondary"
+                    className="border-white text-white hover:bg-white/10"
+                  >
+                    Go to Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/signin">
+                  <Button
+                    size="lg"
+                    variant="outline-secondary"
+                    className="border-white text-white hover:bg-white/10"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </Card>
         </section>
       </main>
 
-      <footer style={{ padding: '24px 32px', borderTop: '1px solid rgba(10,15,30,0.08)', background: 'white' }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'rgba(10,15,30,0.7)' }}>
-          <span>© {new Date().getFullYear()} Villa</span>
-          <div style={{ display: 'flex', gap: 12 }}>
-            {user ? (
-              <Link
-                to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
-                style={{ color: '#1976d2', textDecoration: 'none' }}
-              >
-                Go to Dashboard
-              </Link>
-            ) : (
-              <Link to="/signin" style={{ color: '#1976d2', textDecoration: 'none' }}>Tenant/Manager sign in</Link>
-            )}
+      {/* Footer */}
+      <footer className="border-t border-secondary-200 bg-white mt-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-md">
+                  <Building2 size={24} className="text-white" />
+                </div>
+                <span className="text-xl font-bold text-secondary-900">Villa</span>
+              </div>
+              <p className="text-secondary-600 mb-4 max-w-md">
+                Modern apartment maintenance management that brings clarity and efficiency to property operations.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-secondary-900 mb-4">Product</h4>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#features" className="text-secondary-600 hover:text-primary transition-colors">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <Link to="/quote" className="text-secondary-600 hover:text-primary transition-colors">
+                    Pricing
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-secondary-900 mb-4">Access</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/signin" className="text-secondary-600 hover:text-primary transition-colors">
+                    Sign In
+                  </Link>
+                </li>
+                {user && (
+                  <li>
+                    <Link
+                      to={role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard'}
+                      className="text-secondary-600 hover:text-primary transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-secondary-200 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-secondary-500">
+              © {new Date().getFullYear()} Villa. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm text-secondary-500">
+              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+              <a href="#" className="hover:text-primary transition-colors">Terms</a>
+              <a href="#" className="hover:text-primary transition-colors">Contact</a>
+            </div>
           </div>
         </div>
       </footer>
