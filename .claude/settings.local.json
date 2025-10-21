@@ -3,7 +3,8 @@
     "allow": [
       "WebSearch",
       "mcp__firebase__firestore_list_collections",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "mcp__context7__resolve-library-id"
     ],
     "deny": [],
     "ask": []

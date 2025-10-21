@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import styles from './StatusSelector.module.css';
+import Select from './ui/Select';
+import Button from './ui/Button';
 
 function StatusSelector({ currentStatus, onStatusChange }) {
     const [selectedStatus, setSelectedStatus] = useState(currentStatus);
     const [isUpdating, setIsUpdating] = useState(false);
 
     const statusOptions = [
-        { value: 'open', label: 'Open', color: '#1976d2' },
-        { value: 'in_progress', label: 'In Progress', color: '#ff9800' },
-        { value: 'closed', label: 'Closed', color: '#4caf50' },
-        { value: 'cancelled', label: 'Cancelled', color: '#f44336' }
+        { value: 'open', label: 'Open' },
+        { value: 'in_progress', label: 'In Progress' },
+        { value: 'closed', label: 'Closed' },
+        { value: 'cancelled', label: 'Cancelled' }
     ];
 
     const handleStatusChange = (e) => {
@@ -31,40 +32,32 @@ function StatusSelector({ currentStatus, onStatusChange }) {
         }
     };
 
-    const getCurrentStatusColor = () => {
-        const status = statusOptions.find(s => s.value === selectedStatus);
-        return status ? status.color : '#1976d2';
-    };
-
     return (
-        <div className={styles.container}>
-            <div className={styles.selectContainer}>
-                <label htmlFor="status" className={styles.label}>
-                    Status
-                </label>
-                <select
+        <div className="flex items-end gap-4">
+            <div className="flex-1">
+                <Select
+                    label="Status"
                     id="status"
-                    className={styles.select}
                     value={selectedStatus}
                     onChange={handleStatusChange}
-                    style={{ borderColor: getCurrentStatusColor() }}
                 >
                     {statusOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                             {option.label}
                         </option>
                     ))}
-                </select>
+                </Select>
             </div>
 
             {selectedStatus !== currentStatus && (
-                <button
-                    className={styles.updateButton}
+                <Button
                     onClick={handleUpdate}
                     disabled={isUpdating}
+                    loading={isUpdating}
+                    variant="primary"
                 >
-                    {isUpdating ? 'Updating...' : 'Update Status'}
-                </button>
+                    Update Status
+                </Button>
             )}
         </div>
     );

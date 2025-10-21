@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="report.js" defer></script>
+    <script src="report.js" type="module" defer></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,13 +19,14 @@
         </div>
         <div id="description-of-issue" class="panel">
             <h2>What is the issue?</h2>
-            <input id="description-input" class="second"></input>
+            <textarea id="description-input" class="second"></textarea>
             <button id="submit-description-button" class="second">Submit Description</button>
         </div>
         <div id="submit-issue" class="panel">
             <h2>Would you like to submit any pictures?  If not, you're ready to submit!</h2>
-            <button id="submit-ticket-button">Submit Ticket</button>
+            <button id="submit-ticket-button" class="second">Submit Ticket</button>
         </div>
     </div>
+    <button id="back-arrow">&larr;</button>
 </body>
 </html>
