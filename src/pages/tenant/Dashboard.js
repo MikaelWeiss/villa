@@ -10,9 +10,12 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';
 import Badge from '../../components/ui/Badge';
+import TicketDetailModal from "../../components/TicketDetailModal.js"
 
 function TenantDashboard() {
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const { signOut, user } = useAuth();
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -73,6 +76,7 @@ function TenantDashboard() {
         image_urls: report.image_urls || [],
         status: report.status || 'open'
     }));
+    
 
     // Get recent reports (limit to 3)
     const recentReports = formattedTickets.slice(0, 3);
@@ -81,6 +85,11 @@ function TenantDashboard() {
     const openCount = reports.filter(r => r.status === 'open').length;
     const inProgressCount = reports.filter(r => r.status === 'in-progress').length;
     const resolvedCount = reports.filter(r => r.status === 'resolved').length;
+
+    const handleTicketClick = (ticket) => {
+        setSelectedTicket(ticket);
+        setIsDetailModalOpen(true);
+    };
 
     return (
         <div className="flex">
@@ -244,7 +253,8 @@ function TenantDashboard() {
                                 {recentReports.map((report, index) => (
                                     <div
                                         key={report.id}
-                                        className="p-4 border border-secondary-200 rounded-xl hover:border-primary-200 hover:shadow-sm transition-all duration-300 animate-fade-in-up"
+                                        onClick={() => handleTicketClick(report)}
+                                        className="p-4 border border-secondary-200 rounded-xl hover:border-primary-200 hover:shadow-sm transition-all duration-300 animate-fade-in-up cursor-pointer"
                                         style={{animationDelay: `${index * 0.1}s`}}
                                     >
                                         <div className="flex items-start gap-4">
@@ -295,6 +305,16 @@ function TenantDashboard() {
                     </Card.Content>
                 </Card>
             </div>
+            
+            {/* Ticket Detail Modal */}
+            <TicketDetailModal 
+                isOpen={isDetailModalOpen}
+                onClose={() => {
+                    setIsDetailModalOpen(false);
+                    setSelectedTicket(null);
+                }}
+                ticket={selectedTicket}
+            />
         </div>
     )
 }

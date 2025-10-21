@@ -3,7 +3,7 @@ import Card from './ui/Card';
 import Badge from './ui/Badge';
 import EmptyState from './ui/EmptyState';
 
-function TenantMaintenanceList({ tickets }) {
+function TenantMaintenanceList({ tickets, onTicketClick }) {
     if (tickets.length === 0) {
         return (
             <EmptyState
@@ -26,7 +26,11 @@ function TenantMaintenanceList({ tickets }) {
 
     function Ticket({ ticket }) {
         return (
-            <Card>
+            <Card 
+                interactive={true}
+                onClick={() => onTicketClick && onTicketClick(ticket)}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200"
+            >
                 <h3 className="text-lg font-semibold text-secondary-800 mb-3">
                     {ticket.title}
                 </h3>
@@ -36,10 +40,10 @@ function TenantMaintenanceList({ tickets }) {
                         {ticket.severity}
                     </Badge>
                 </div>
-                <p className="text-secondary-700 mb-3">{ticket.description}</p>
+                <p className="text-secondary-700 mb-3 line-clamp-3">{ticket.description}</p>
                 {ticket.image_urls && ticket.image_urls.length > 0 && (
                     <div className="grid grid-cols-4 gap-2 mt-4">
-                        {ticket.image_urls.map((url, index) => (
+                        {ticket.image_urls.slice(0, 4).map((url, index) => (
                             <img
                                 key={index}
                                 src={url}
@@ -47,8 +51,20 @@ function TenantMaintenanceList({ tickets }) {
                                 className="w-full h-24 object-cover rounded-lg"
                             />
                         ))}
+                        {ticket.image_urls.length > 4 && (
+                            <div className="w-full h-24 bg-secondary-200 rounded-lg flex items-center justify-center">
+                                <span className="text-secondary-500 text-sm font-medium">
+                                    +{ticket.image_urls.length - 4} more
+                                </span>
+                            </div>
+                        )}
                     </div>
                 )}
+                <div className="mt-4 pt-3 border-t border-secondary-100">
+                    <p className="text-sm text-secondary-500 text-center">
+                        Click to view details
+                    </p>
+                </div>
             </Card>
         )
     }

@@ -1,5 +1,6 @@
 import Nav from '../../components/nav/Nav.js';
 import TenantMaintenanceList from "../../components/TenantMaintenanceList";
+import TicketDetailModal from "../../components/TicketDetailModal";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,6 +12,8 @@ function TenantReports() {
     const { signOut, user } = useAuth();
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
     const fetchReports = useCallback(async () => {
         if (!user) return;
@@ -64,8 +67,17 @@ function TenantReports() {
         title: `Unit ${report.unit}`,
         date: new Date(report.created_at).toLocaleDateString(),
         severity: report.severity || 'medium',
-        description: report.description
+        description: report.description,
+        image_urls: report.image_urls || [],
+        status: report.status || 'open',
+        created_at: report.created_at,
+        updated_at: report.updated_at
     }));
+
+    const handleTicketClick = (ticket) => {
+        setSelectedTicket(ticket);
+        setIsDetailModalOpen(true);
+    };
 
     return (
         <div className="flex">
@@ -82,9 +94,22 @@ function TenantReports() {
                 {loading ? (
                     <p className="text-secondary-500">Loading...</p>
                 ) : (
-                    <TenantMaintenanceList tickets={formattedTickets} />
+                    <TenantMaintenanceList 
+                        tickets={formattedTickets} 
+                        onTicketClick={handleTicketClick}
+                    />
                 )}
             </div>
+            
+            {/* Ticket Detail Modal */}
+            <TicketDetailModal 
+                isOpen={isDetailModalOpen}
+                onClose={() => {
+                    setIsDetailModalOpen(false);
+                    setSelectedTicket(null);
+                }}
+                ticket={selectedTicket}
+            />
         </div>
     )
 }
