@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "setup": "npm install",
+        "setup": "npm install && cp ../../.env .env",
         "run": "npm start"
     }
 }
