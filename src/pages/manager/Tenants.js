@@ -1,17 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
-import { Wrench, LayoutDashboard, Users } from "lucide-react";
+import { Wrench, LayoutDashboard, Users, ArrowUpDown, ArrowUp, ArrowDown, Search } from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
 import EmptyState from '../../components/ui/EmptyState';
+import Input from '../../components/ui/Input';
 
 function ManagerTenantsPage() {
     const { signOut } = useAuth();
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortColumn, setSortColumn] = useState('tenant_name');
+    const [sortDirection, setSortDirection] = useState('asc');
 
     const nav = (
         <Nav navElements={[
@@ -81,6 +85,43 @@ function ManagerTenantsPage() {
             setLoading(false);
         }
     }, []);
+
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortColumn(column);
+            setSortDirection('asc');
+        }
+    };
+
+    const getSortIcon = (column) => {
+        if (sortColumn !== column) {
+            return <ArrowUpDown size={16} className="text-secondary-400" />;
+        }
+        return sortDirection === 'asc'
+            ? <ArrowUp size={16} className="text-primary" />
+            : <ArrowDown size={16} className="text-primary" />;
+    };
+
+    const filteredAndSortedTenants = tenants
+        .filter(tenant =>
+            tenant.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            let aValue = a[sortColumn];
+            let bValue = b[sortColumn];
+
+            // Handle string comparison for tenant_name
+            if (sortColumn === 'tenant_name') {
+                aValue = (aValue || '').toLowerCase();
+                bValue = (bValue || '').toLowerCase();
+            }
+
+            if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
 
     useEffect(() => {
         document.title = 'Tenants - Villa';
@@ -153,26 +194,56 @@ function ManagerTenantsPage() {
                         description="There are no tenants with maintenance requests at this time."
                     />
                 ) : (
-                    <div className="w-full">
+                    <div className="w-full flex flex-col gap-4">
+                        <div className="relative max-w-md">
+                            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                <Search size={20} className="text-secondary-400" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search tenants..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-smooth bg-white"
+                            />
+                        </div>
                         <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm">
                             <thead>
                                 <tr className="bg-secondary-50 border-b-2 border-secondary-200">
-                                    <th className="p-4 text-left font-semibold text-secondary-800">
-                                        Tenant Name
+                                    <th
+                                        className="p-4 text-left font-semibold text-secondary-800 cursor-pointer hover:bg-secondary-100 transition-smooth select-none"
+                                        onClick={() => handleSort('tenant_name')}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            Tenant Name
+                                            {getSortIcon('tenant_name')}
+                                        </div>
                                     </th>
                                     <th className="p-4 text-left font-semibold text-secondary-800">
                                         Units
                                     </th>
-                                    <th className="p-4 text-center font-semibold text-secondary-800">
-                                        Open Reports
+                                    <th
+                                        className="p-4 text-center font-semibold text-secondary-800 cursor-pointer hover:bg-secondary-100 transition-smooth select-none"
+                                        onClick={() => handleSort('openReports')}
+                                    >
+                                        <div className="flex items-center justify-center gap-2">
+                                            Open Reports
+                                            {getSortIcon('openReports')}
+                                        </div>
                                     </th>
-                                    <th className="p-4 text-center font-semibold text-secondary-800">
-                                        Total Reports
+                                    <th
+                                        className="p-4 text-center font-semibold text-secondary-800 cursor-pointer hover:bg-secondary-100 transition-smooth select-none"
+                                        onClick={() => handleSort('totalReports')}
+                                    >
+                                        <div className="flex items-center justify-center gap-2">
+                                            Total Reports
+                                            {getSortIcon('totalReports')}
+                                        </div>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {tenants.map((tenant, index) => (
+                                {filteredAndSortedTenants.map((tenant, index) => (
                                     <tr
                                         key={tenant.tenant_id}
                                         className={`border-b border-secondary-200 last:border-b-0 ${
