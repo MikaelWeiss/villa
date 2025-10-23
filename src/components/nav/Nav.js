@@ -1,9 +1,11 @@
 import NavElement from "./NavElement";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Building2, User } from "lucide-react";
 
 function Nav({ navElements }) {
     const { user, role } = useAuth();
+    const navigate = useNavigate();
 
     // Get user initials for avatar
     const getUserInitials = () => {
@@ -16,21 +18,31 @@ function Nav({ navElements }) {
         return email.substring(0, 2).toUpperCase();
     };
 
+    // Navigate to appropriate dashboard based on role
+    const handleLogoClick = () => {
+        const dashboardPath = role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard';
+        navigate(dashboardPath);
+    };
+
     return (
         <nav className="fixed w-315 h-screen bg-white border-r border-secondary-100 flex flex-col shadow-sm">
             {/* Logo and Brand */}
             <div className="px-6 py-6 border-b border-secondary-100">
-                <div className="flex items-center gap-3">
+                <button
+                    onClick={handleLogoClick}
+                    className="flex items-center gap-3 w-full cursor-pointer hover:opacity-80 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg p-1 -m-1"
+                    aria-label="Go to dashboard"
+                >
                     <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-md">
                         <Building2 size={24} className="text-white" />
                     </div>
-                    <div>
+                    <div className="text-left">
                         <h1 className="text-xl font-bold text-secondary-900 leading-none mb-0.5">Villa</h1>
                         <p className="text-xs text-secondary-500 capitalize leading-none">
                             {role || 'User'} Portal
                         </p>
                     </div>
-                </div>
+                </button>
             </div>
 
             {/* Navigation Items */}
