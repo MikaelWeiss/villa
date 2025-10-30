@@ -9,7 +9,7 @@ function Select({
   containerClassName = '',
   ...props
 }) {
-  const baseStyles = 'w-full px-4 py-3 border rounded-lg transition-smooth focus-ring bg-white appearance-none cursor-pointer';
+  const baseStyles = 'w-full pl-4 pr-12 py-3 border rounded-lg transition-smooth focus-ring bg-white appearance-none cursor-pointer';
   const errorStyles = error
     ? 'border-error focus:ring-error'
     : 'border-secondary-300 focus:border-primary';
