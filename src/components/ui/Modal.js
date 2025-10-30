@@ -58,7 +58,7 @@ function ModalHeader({ children, onClose, className = '' }) {
       {onClose && (
         <button
           onClick={onClose}
-          className="ml-4 text-secondary-400 hover:text-secondary-600 transition-smooth focus-ring rounded-lg p-1"
+          className="ml-4 text-secondary-100 hover:text-secondary-600 transition-smooth focus-ring rounded-lg p-1"
           aria-label="Close"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -6,6 +6,9 @@ import Input from './ui/Input';
 import TextArea from './ui/TextArea';
 import Select from './ui/Select';
 import Button from './ui/Button';
+import SvgReportWizard from './SvgReportWizard';
+
+const useSvgForm = true;
 
 function NewTicketModal({ setIsOpen, onReportCreated }) {
     const { user } = useAuth();
@@ -15,6 +18,8 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
         description: '',
         severity: 'medium'
     });
+    const [wizardCompleted, setWizardCompleted] = useState(false);
+    const [showBackButton, setShowBackButton] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -32,13 +37,11 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     const handleFileSelect = (e) => {
         const files = Array.from(e.target.files);
 
-        // Validate file count (max 5 images)
         if (files.length > 5) {
             setError('Maximum 5 images allowed');
             return;
         }
 
-        // Validate file sizes (max 5MB each)
         const validFiles = files.filter(file => {
             if (file.size > 5 * 1024 * 1024) {
                 setError(`File ${file.name} exceeds 5MB limit`);
@@ -51,7 +54,6 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
 
         setSelectedFiles(validFiles);
 
-        // Create previews
         const previews = validFiles.map(file => URL.createObjectURL(file));
         setFilePreviews(previews);
     };
@@ -67,7 +69,6 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                 const fileName = `${reportId}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
                 const filePath = `${user.id}/${fileName}`;
 
-                // Upload to Storage
                 const { data, error: uploadError } = await supabase.storage
                     .from('damage-reports')
                     .upload(filePath, file);
@@ -76,7 +77,6 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                     throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`);
                 }
 
-                // Get public URL
                 const { data: { publicUrl } } = supabase.storage
                     .from('damage-reports')
                     .getPublicUrl(filePath);
@@ -93,8 +93,8 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.unit || !formData.title || !formData.description) {
-            setError('All fields are required');
+        if (!formData.unit || !formData.title) {
+            setError('Unit number and issue are required');
             return;
         }
 
@@ -102,7 +102,6 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
         setError('');
 
         try {
-            // Create report record first
             const { data: reportData, error: insertError } = await supabase
                 .from('reports')
                 .insert([{
@@ -122,29 +121,24 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
 
             const reportId = reportData[0].id;
 
-            // Upload images and get URLs
             let imageUrls = [];
             if (selectedFiles.length > 0) {
                 imageUrls = await uploadImages(reportId);
 
-                // Update report with image URLs
                 const { error: updateError } = await supabase
                     .from('reports')
                     .update({ image_urls: imageUrls })
                     .eq('id', reportId);
 
                 if (updateError) {
-                    // Report created but image URLs not saved
-                    // Continue since main report was created successfully
+                    // Non-critical error
                 }
             }
 
-            // Call parent callback to refresh list
             if (onReportCreated) {
                 onReportCreated();
             }
 
-            // Close modal
             setIsOpen(false);
         } catch (err) {
             setError(err.message || 'Failed to create report. Please try again.');
@@ -159,6 +153,15 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
             URL.revokeObjectURL(prev[index]);
             return prev.filter((_, i) => i !== index);
         });
+    };
+
+    const handleWizardComplete = (wizardData) => {
+        setFormData(prev => ({
+            ...prev,
+            title: `${wizardData.room}/${wizardData.item}`,
+            description: wizardData.description
+        }));
+        setWizardCompleted(true);
     };
 
     return (
@@ -187,27 +190,43 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                             disabled={loading}
                         />
 
-                        <TextArea
-                            label="What's Broken? *"
-                            id="title"
-                            placeholder="Brief summary of the issue..."
-                            rows={3}
-                            value={formData.title}
-                            onChange={handleInputChange}
-                            required
-                            disabled={loading}
-                        />
+                        {useSvgForm ? (
+                                                                                                    <div className={`py-12 ${wizardCompleted ? 'border-2 border-success-500 rounded-lg p-4' : ''}`}>
+                                                                                                        {wizardCompleted ? (                                    <div>
+                                        <h3 className='text-lg font-semibold text-success-700'>Issue Selected:</h3>
+                                        <p className='text-secondary-800 font-medium'>{formData.title}</p>
+                                        <p className='text-secondary-600'>{formData.description}</p>
+                                        <Button variant="outline" size="sm" onClick={() => setWizardCompleted(false)} className="mt-2">Change</Button>
+                                    </div>
+                                ) : (
+                                    <SvgReportWizard onComplete={handleWizardComplete} onPanelChange={setShowBackButton} />
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                <TextArea
+                                    label="What's Broken? *"
+                                    id="title"
+                                    placeholder="Brief summary of the issue..."
+                                    rows={3}
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    required
+                                    disabled={loading}
+                                />
 
-                        <TextArea
-                            label="Damage Description *"
-                            id="description"
-                            placeholder="Please describe the damage in detail..."
-                            rows={4}
-                            value={formData.description}
-                            onChange={handleInputChange}
-                            required
-                            disabled={loading}
-                        />
+                                <TextArea
+                                    label="Damage Description *"
+                                    id="description"
+                                    placeholder="Please describe the damage in detail..."
+                                    rows={4}
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    required
+                                    disabled={loading}
+                                />
+                            </>
+                        )}
 
                         <Select
                             label="Severity Level"
