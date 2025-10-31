@@ -1,0 +1,161 @@
+:root {
+    --standard-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    --blue: #1976d2;
+    --darker-blue: #1565c0;
+    --off-white: #f5f7fa;
+    --off-black: #141414;
+}
+
+.svg-wizard-container #screen {
+    width: 100%;
+}
+
+.svg-wizard-container button {
+    background-color: var(--blue);
+    color: white;
+    font-size: 1.1em;
+    padding: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border: none;
+    border-radius: 50px;
+    position: relative;
+    transition: ease 150ms;
+}
+
+.svg-wizard-container button:hover {
+    top: 5px;
+    cursor: pointer;
+    background-color: var(--darker-blue);
+}
+
+.svg-wizard-container #floor-plan {
+    stroke: var(--off-black);
+    stroke-miterlimit: 10;
+}
+
+.svg-wizard-container #floor-plan text {
+    stroke: none;
+    text-anchor: middle;
+    fill: var(--off-black);
+    font-family: var(--standard-font);
+}
+
+.svg-wizard-container #selectable * {
+    transition: ease 150ms;
+    stroke-width: 5px;
+    fill: #ffffff00;
+}
+
+.svg-wizard-container #selectable *:hover {
+    cursor: pointer;
+    fill: #00000050;
+}
+
+.svg-wizard-container #furnishings {
+    stroke-width: 3px;
+    fill: none;
+}
+
+.svg-wizard-container #walls {
+    stroke-width: 5px;
+}
+
+.svg-wizard-container #item-options {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.svg-wizard-container #floor-plan {
+    width: 95%;
+    max-width: 650px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.svg-wizard-container .panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    gap: 20px;
+}
+
+.svg-wizard-container .panel h2 {
+    font-size: 24px;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.svg-wizard-container .second {
+    position: relative;
+    animation-name: slide-on;
+    animation-duration: 1s;
+    animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+    animation-delay: 0.5s;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+.svg-wizard-container .panel:not(:first-child) {
+    display: none;
+}
+
+#back-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--blue);
+    transition: ease 150ms;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#back-arrow:hover {
+    background-color: var(--darker-blue);
+}
+
+@keyframes slide-on {
+    0% {
+        top: 75px;
+        opacity: 0;
+    }
+    100% {
+        top: 0px;
+        opacity: 1;
+    }
+}
+
+#floor-plan > svg {
+    width: 100%;
+    height: auto;
+}
+
+.wizard-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
