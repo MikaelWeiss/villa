@@ -131,13 +131,6 @@ function ManagerDashboard() {
                     title="Dashboard"
                     actions={
                         <div className="flex items-center gap-3">
-                            <Button
-                                variant="outline-secondary"
-                                size="sm"
-                                leftIcon={<Calendar />}
-                            >
-                                Last 30 Days
-                            </Button>
                             <Button variant="danger" onClick={signOut} size="sm">
                                 Sign Out
                             </Button>
