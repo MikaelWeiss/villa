@@ -39,7 +39,7 @@ function Nav({ navElements }) {
                     <div className="text-left">
                         <h1 className="text-xl font-bold text-secondary-900 leading-none mb-0.5">Villa</h1>
                         <p className="text-xs text-secondary-500 capitalize leading-none">
-                            {role || 'User'} Portal
+                            {role || 'User'} Dashboard
                         </p>
                     </div>
                 </button>
