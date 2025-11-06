@@ -45,7 +45,7 @@ function ManagerMaintenanceList({ tickets }) {
                             {ticket.title}
                         </h3>
                         <span className="text-sm text-secondary-600">
-                            {ticket.tenantName} - {ticket.property || ticket.unit}
+                            {ticket.tenantName} - {ticket.property || ticket.unit} ({ticket.organizationName})
                         </span>
                     </div>
                 </div>

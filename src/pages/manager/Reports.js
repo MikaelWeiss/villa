@@ -10,7 +10,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import Select from '../../components/ui/Select';
 
 function ManagerMaintenanceListPage() {
-    const { signOut } = useAuth();
+    const { signOut, profile, role } = useAuth();
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -40,9 +40,14 @@ function ManagerMaintenanceListPage() {
         />)
 
     const fetchReports = useCallback(async () => {
+        if (role && !profile) return;
         setLoading(true);
         try {
-            let query = supabase.from('reports').select('*');
+            let query = supabase.from('reports').select('*, organization:organizations(name)');
+
+            if (role === 'manager' && profile?.organization_ids) {
+                query = query.in('organization_id', profile.organization_ids);
+            }
 
             if (dayRange > 0) {
                 const startDate = new Date();
@@ -62,7 +67,9 @@ function ManagerMaintenanceListPage() {
 
             const fetchedTickets = data.map(report => ({
                 id: report.id,
-                title: report.description?.substring(0, 50) + '...' || 'No title',
+                title: report.description && report.description.length > 50
+                    ? report.description.substring(0, 50) + '...'
+                    : report.description || 'No title',
                 date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
@@ -74,7 +81,8 @@ function ManagerMaintenanceListPage() {
                 property: report.unit || 'Unknown unit',
                 unit: report.unit,
                 status: report.status || 'open',
-                image_urls: report.image_urls || []
+                image_urls: report.image_urls || [],
+                organizationName: report.organization?.name || 'Unknown Organization',
             }));
 
             setTickets(fetchedTickets);
@@ -83,7 +91,7 @@ function ManagerMaintenanceListPage() {
         } finally {
             setLoading(false);
         }
-    }, [dayRange]);
+    }, [dayRange, profile, role]);
 
     useEffect(() => {
         document.title = 'Maintenance Reports - Villa';
@@ -93,7 +101,9 @@ function ManagerMaintenanceListPage() {
     useEffect(() => {
         const transformReportToTicket = (report) => ({
             id: report.id,
-            title: report.description?.substring(0, 50) + '...' || 'No title',
+            title: report.description && report.description.length > 50
+                ? report.description.substring(0, 50) + '...'
+                : report.description || 'No title',
             date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
@@ -105,12 +115,17 @@ function ManagerMaintenanceListPage() {
             property: report.unit || 'Unknown unit',
             unit: report.unit,
             status: report.status || 'open',
-            image_urls: report.image_urls || []
+            image_urls: report.image_urls || [],
+            organizationName: report.organization?.name || 'Unknown Organization',
         });
 
         const channel = supabase
             .channel('all-reports-changes')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, (payload) => {
+                if (role === 'manager' && profile?.organization_ids && !profile.organization_ids.includes(payload.new.organization_id)) {
+                    return;
+                }
+
                 if (payload.eventType === 'INSERT') {
                     const newTicket = transformReportToTicket(payload.new);
                     setTickets(prev => [newTicket, ...prev]);
@@ -128,7 +143,7 @@ function ManagerMaintenanceListPage() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, [profile, role]);
 
     const handleDayRangeChange = (event) => {
         const value = parseInt(event.target.value, 10);
@@ -143,7 +158,9 @@ function ManagerMaintenanceListPage() {
         { value: 0, label: 'All Time' },
     ];
 
-    if (loading) {
+    const { loading: authLoading } = useAuth();
+
+    if (loading || authLoading) {
         return (
             <div className="flex min-h-screen">
                 {nav}

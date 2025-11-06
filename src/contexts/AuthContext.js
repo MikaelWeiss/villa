@@ -13,7 +13,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkUserRole(session.user.email);
+        loadUserProfile(session.user);
       } else {
         setLoading(false);
       }
@@ -33,9 +33,9 @@ export const AuthProvider = ({ children }) => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkUserRole(session.user.email);
+        loadUserProfile(session.user);
       } else {
-        setRole(null);
+        setProfile(null);
         setLoading(false);
       }
     });
@@ -43,22 +43,35 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkUserRole = async (email) => {
+  const loadUserProfile = async (user) => {
     try {
       const { data, error } = await supabase
-        .from('managers')
-        .select('email')
-        .eq('email', email)
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error checking role:', error);
+        console.error('Error fetching profile:', error);
       }
 
-      setRole(data ? 'manager' : 'tenant');
+      if (data) {
+        const { data: orgs, error: orgsError } = await supabase
+          .from('users_organizations')
+          .select('organization_id')
+          .eq('user_id', user.id);
+
+        if (orgsError) {
+          console.error('Error fetching user organizations:', orgsError);
+        } else {
+          data.organization_ids = orgs.map(org => org.organization_id);
+        }
+      }
+
+      setProfile(data);
     } catch (error) {
-      console.error('Error checking role:', error);
-      setRole('tenant');
+      console.error('Error fetching profile:', error);
+      setProfile(null);
     } finally {
       setLoading(false);
     }
@@ -81,7 +94,8 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
-    role,
+    profile,
+    role: profile?.role || 'tenant',
     loading,
     signInWithEmail,
     signOut,

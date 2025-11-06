@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import Nav from '../../components/nav/Nav';
 import StatusSelector from '../../components/StatusSelector';
-import { Wrench, House, Users, ArrowLeft } from 'lucide-react';
+import { Wrench, LayoutDashboard, Users, ArrowLeft } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';
@@ -13,7 +13,7 @@ import Badge from '../../components/ui/Badge';
 function ManagerMaintenanceDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { signOut } = useAuth();
+    const { signOut, profile, role } = useAuth();
     const [maintenanceRequest, setMaintenanceRequest] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -23,40 +23,48 @@ function ManagerMaintenanceDetail() {
             {
                 name: "Dashboard",
                 id: crypto.randomUUID(),
-                icon: <House size={20} />,
+                icon: <LayoutDashboard size={20} />,
                 path: "/manager/dashboard",
-            },
-            {
-                name: "Maintenance",
-                id: crypto.randomUUID(),
-                icon: <Wrench size={20} />,
-                path: "/manager/reports"
             },
             {
                 name: "Tenants",
                 id: crypto.randomUUID(),
                 icon: <Users size={20} />,
                 path: "/manager/tenants"
+            },
+            {
+                name: "Maintenance",
+                id: crypto.randomUUID(),
+                icon: <Wrench size={20} />,
+                path: "/manager/reports"
             }
         ]}
         />
     );
 
     const fetchMaintenanceRequest = useCallback(async () => {
+        if (role && !profile) return;
         try {
             setLoading(true);
-            const { data, error: fetchError } = await supabase
+            let query = supabase
                 .from('reports')
-                .select('*')
-                .eq('id', id)
-                .single();
+                .select('*, organizations(name)')
+                .eq('id', id);
+
+            if (role === 'manager' && profile?.organization_ids) {
+                query = query.in('organization_id', profile.organization_ids);
+            }
+
+            const { data, error: fetchError } = await query.single();
 
             if (fetchError) throw fetchError;
 
             if (data) {
                 setMaintenanceRequest({
                     id: data.id,
-                    title: data.description?.substring(0, 50) + '...' || 'Maintenance Request',
+                    title: data.description && data.description.length > 50
+                        ? data.description.substring(0, 50) + '...'
+                        : data.description || 'Maintenance Request',
                     description: data.description || 'No description',
                     date: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -67,7 +75,8 @@ function ManagerMaintenanceDetail() {
                     status: data.status || 'open',
                     unitNumber: data.unit,
                     updatedAt: data.updated_at || data.created_at,
-                    image_urls: data.image_urls || []
+                    image_urls: data.image_urls || [],
+                    organizationName: data.organizations ? data.organizations.name : 'N/A'
                 });
             } else {
                 setError('Maintenance request not found');
@@ -77,7 +86,7 @@ function ManagerMaintenanceDetail() {
         } finally {
             setLoading(false);
         }
-    }, [id]);
+    }, [id, profile, role]);
 
     useEffect(() => {
         document.title = 'Report Details - Villa';
@@ -106,7 +115,9 @@ function ManagerMaintenanceDetail() {
         }
     };
 
-    if (loading) {
+    const { loading: authLoading } = useAuth();
+
+    if (loading || authLoading) {
         return (
             <div className="flex min-h-screen">
                 {nav}
@@ -171,6 +182,10 @@ function ManagerMaintenanceDetail() {
                             <Card.Content>
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <span className="text-sm font-medium text-secondary-500">Organization:</span>
+                                            <p className="text-secondary-800">{maintenanceRequest.organizationName}</p>
+                                        </div>
                                         <div>
                                             <span className="text-sm font-medium text-secondary-500">Date Submitted:</span>
                                             <p className="text-secondary-800">{maintenanceRequest.date}</p>
