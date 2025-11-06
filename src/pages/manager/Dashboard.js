@@ -24,7 +24,7 @@ import StatCard from '../../components/ui/StatCard';
 import Badge from '../../components/ui/Badge';
 
 function ManagerDashboard() {
-    const { signOut } = useAuth();
+    const { signOut, profile, role } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -37,11 +37,19 @@ function ManagerDashboard() {
     const [recentReports, setRecentReports] = useState([]);
 
     const fetchDashboardData = useCallback(async () => {
+        if (role && !profile) return;
         try {
-            const { data: reports, error } = await supabase
+            let query = supabase
                 .from('reports')
-                .select('*')
-                .order('created_at', { ascending: false });
+                .select('*, organization:organizations(name)');
+
+            if (role === 'manager' && profile?.organization_ids) {
+                query = query.in('organization_id', profile.organization_ids);
+            }
+
+            query = query.order('created_at', { ascending: false });
+
+            const { data: reports, error } = await query;
 
             if (error) throw error;
 
@@ -63,7 +71,9 @@ function ManagerDashboard() {
             // Get recent 5 reports
             setRecentReports(reports.slice(0, 5).map(report => ({
                 id: report.id,
-                description: report.description?.substring(0, 60) + '...' || 'No description',
+                description: report.description && report.description.length > 60
+                    ? report.description.substring(0, 60) + '...'
+                    : report.description || 'No description',
                 unit: report.unit,
                 tenant: report.tenant_name || 'Unknown',
                 status: report.status || 'open',
@@ -71,14 +81,15 @@ function ManagerDashboard() {
                 date: new Date(report.created_at).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric'
-                })
+                }),
+                organizationName: report.organization?.name || 'Unknown Organization',
             })));
 
             setLoading(false);
         } catch (err) {
             setLoading(false);
         }
-    }, []);
+    }, [profile, role]);
 
     useEffect(() => {
         document.title = 'Manager Dashboard - Villa';
@@ -108,7 +119,9 @@ function ManagerDashboard() {
         ]}
         />)
 
-    if (loading) {
+    const { loading: authLoading } = useAuth();
+
+    if (loading || authLoading) {
         return (
             <div className="flex min-h-screen">
                 {nav}
@@ -275,6 +288,8 @@ function ManagerDashboard() {
                                                             <span className="font-medium">{report.tenant}</span>
                                                             <span className="text-secondary-400">•</span>
                                                             <span>Unit {report.unit}</span>
+                                                            <span className="text-secondary-400">•</span>
+                                                            <span>{report.organizationName}</span>
                                                             <span className="text-secondary-400">•</span>
                                                             <span>{report.date}</span>
                                                         </div>

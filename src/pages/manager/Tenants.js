@@ -9,7 +9,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import Input from '../../components/ui/Input';
 
 function ManagerTenantsPage() {
-    const { signOut } = useAuth();
+    const { signOut, profile, role } = useAuth();
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -41,12 +41,20 @@ function ManagerTenantsPage() {
         />)
 
     const fetchTenants = useCallback(async () => {
+        if (role && !profile) return;
         try {
             // Get all unique tenants from reports
-            const { data: reports, error: fetchError } = await supabase
+            let query = supabase
                 .from('reports')
-                .select('tenant_id, tenant_name, unit, status')
-                .order('tenant_name', { ascending: true });
+                .select('tenant_id, tenant_name, unit, status');
+
+            if (role === 'manager' && profile?.organization_ids) {
+                query = query.in('organization_id', profile.organization_ids);
+            }
+
+            query = query.order('tenant_name', { ascending: true });
+
+            const { data: reports, error: fetchError } = await query;
 
             if (fetchError) throw fetchError;
 
@@ -84,7 +92,7 @@ function ManagerTenantsPage() {
             setError('Failed to load tenants');
             setLoading(false);
         }
-    }, []);
+    }, [profile, role]);
 
     const handleSort = (column) => {
         if (sortColumn === column) {
@@ -149,7 +157,9 @@ function ManagerTenantsPage() {
         };
     }, [fetchTenants])
 
-    if (loading) {
+    const { loading: authLoading } = useAuth();
+
+    if (loading || authLoading) {
         return (
             <div className="flex min-h-screen">
                 {nav}
