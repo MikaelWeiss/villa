@@ -6,6 +6,10 @@
 ### Changed
 - Changed the name to Villa
 
+## [1.0.0] - November 6th, 2025
+### Added
+- First full deploy
+
 ## Usage Examples
 
 ```markdown
