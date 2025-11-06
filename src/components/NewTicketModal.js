@@ -109,6 +109,7 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                     tenant_name: user.email || 'Unknown',
                     unit: formData.unit,
                     description: formData.title + '\n\n' + formData.description,
+                    organization_id: user.organization_id,
                     severity: formData.severity,
                     status: 'open',
                     image_urls: []
