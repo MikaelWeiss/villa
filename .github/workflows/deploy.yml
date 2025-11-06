@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Copy environment file
+        run: cp /home/mikaelweiss/code/web/villa/.env .env
+
       - name: Install dependencies
         run: npm ci
 
