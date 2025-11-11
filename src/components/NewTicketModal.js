@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import Modal from './ui/Modal';
@@ -13,17 +13,53 @@ const useSvgForm = true;
 function NewTicketModal({ setIsOpen, onReportCreated }) {
         const { user, profile } = useAuth();
     const [formData, setFormData] = useState({
+        organization_id: '',
         unit: '',
         title: '',
         description: '',
         severity: 'medium'
     });
+    const [organizations, setOrganizations] = useState([]);
     const [wizardCompleted, setWizardCompleted] = useState(false);
     const [showBackButton, setShowBackButton] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchOrganizations = async () => {
+            if (!profile?.organization_ids || profile.organization_ids.length === 0) {
+                setError('You must be assigned to an organization to create tickets. Please contact your administrator.');
+                return;
+            }
+
+            try {
+                const { data, error: fetchError } = await supabase
+                    .from('organizations')
+                    .select('id, name')
+                    .in('id', profile.organization_ids);
+
+                if (fetchError) {
+                    throw fetchError;
+                }
+
+                setOrganizations(data || []);
+
+                if (data && data.length === 1) {
+                    setFormData(prev => ({
+                        ...prev,
+                        organization_id: data[0].id
+                    }));
+                }
+            } catch (err) {
+                setError('Failed to load organizations. Please try again.');
+                console.error('Error fetching organizations:', err);
+            }
+        };
+
+        fetchOrganizations();
+    }, [profile]);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -98,6 +134,11 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
             return;
         }
 
+        if (!formData.organization_id) {
+            setError('Organization is required');
+            return;
+        }
+
         setLoading(true);
         setError('');
 
@@ -107,6 +148,7 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                 .insert([{
                     tenant_id: user.id,
                     tenant_name: user.email || 'Unknown',
+                    organization_id: formData.organization_id,
                     unit: formData.unit,
                     description: formData.title + '\n\n' + formData.description,
                     severity: formData.severity,
@@ -179,6 +221,24 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                     )}
 
                     <div className="space-y-4">
+                        {organizations.length > 1 && (
+                            <Select
+                                label="Organization *"
+                                id="organization_id"
+                                value={formData.organization_id}
+                                onChange={handleInputChange}
+                                disabled={loading}
+                                required
+                            >
+                                <option value="">Select an organization</option>
+                                {organizations.map(org => (
+                                    <option key={org.id} value={org.id}>
+                                        {org.name}
+                                    </option>
+                                ))}
+                            </Select>
+                        )}
+
                         <Input
                             label="Unit Number *"
                             id="unit"
