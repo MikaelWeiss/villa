@@ -59,13 +59,31 @@ function ManagerMaintenanceListPage() {
                 query = query.gte('created_at', startDate.toISOString());
             }
 
-            query = query.order('created_at', { ascending: false });
-
             const { data, error: fetchError } = await query;
 
             if (fetchError) throw fetchError;
 
-            const fetchedTickets = data.map(report => ({
+            const statusPriority = {
+                'open': 1,
+                'in_progress': 2,
+                'closed': 3,
+                'cancelled': 4
+            };
+
+            const sortedData = data.sort((a, b) => {
+                const statusA = statusPriority[a.status] || 999;
+                const statusB = statusPriority[b.status] || 999;
+
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+
+                const dateA = new Date(a.updated_at || a.created_at);
+                const dateB = new Date(b.updated_at || b.created_at);
+                return dateB - dateA;
+            });
+
+            const fetchedTickets = sortedData.map(report => ({
                 id: report.id,
                 title: report.description && report.description.length > 50
                     ? report.description.substring(0, 50) + '...'
@@ -83,6 +101,8 @@ function ManagerMaintenanceListPage() {
                 status: report.status || 'open',
                 image_urls: report.image_urls || [],
                 organizationName: report.organization?.name || 'Unknown Organization',
+                created_at: report.created_at,
+                updated_at: report.updated_at,
             }));
 
             setTickets(fetchedTickets);
@@ -99,6 +119,28 @@ function ManagerMaintenanceListPage() {
     }, [fetchReports]);
 
     useEffect(() => {
+        const statusPriority = {
+            'open': 1,
+            'in_progress': 2,
+            'closed': 3,
+            'cancelled': 4
+        };
+
+        const sortTickets = (tickets) => {
+            return [...tickets].sort((a, b) => {
+                const statusA = statusPriority[a.status] || 999;
+                const statusB = statusPriority[b.status] || 999;
+
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+
+                const dateA = new Date(a.updated_at || a.created_at);
+                const dateB = new Date(b.updated_at || b.created_at);
+                return dateB - dateA;
+            });
+        };
+
         const transformReportToTicket = (report) => ({
             id: report.id,
             title: report.description && report.description.length > 50
@@ -117,6 +159,8 @@ function ManagerMaintenanceListPage() {
             status: report.status || 'open',
             image_urls: report.image_urls || [],
             organizationName: report.organization?.name || 'Unknown Organization',
+            created_at: report.created_at,
+            updated_at: report.updated_at,
         });
 
         const channel = supabase
@@ -128,12 +172,12 @@ function ManagerMaintenanceListPage() {
 
                 if (payload.eventType === 'INSERT') {
                     const newTicket = transformReportToTicket(payload.new);
-                    setTickets(prev => [newTicket, ...prev]);
+                    setTickets(prev => sortTickets([newTicket, ...prev]));
                 } else if (payload.eventType === 'UPDATE') {
                     const updatedTicket = transformReportToTicket(payload.new);
-                    setTickets(prev => prev.map(ticket =>
+                    setTickets(prev => sortTickets(prev.map(ticket =>
                         ticket.id === updatedTicket.id ? updatedTicket : ticket
-                    ));
+                    )));
                 } else if (payload.eventType === 'DELETE') {
                     setTickets(prev => prev.filter(ticket => ticket.id !== payload.old.id));
                 }

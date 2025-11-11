@@ -22,6 +22,7 @@ import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';
 import StatCard from '../../components/ui/StatCard';
 import Badge from '../../components/ui/Badge';
+import TicketDetailModal from '../../components/TicketDetailModal';
 
 function ManagerDashboard() {
     const { signOut, profile, role } = useAuth();
@@ -35,6 +36,9 @@ function ManagerDashboard() {
         tenantCount: 0
     });
     const [recentReports, setRecentReports] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [loadingTicket, setLoadingTicket] = useState(false);
 
     const fetchDashboardData = useCallback(async () => {
         if (role && !profile) return;
@@ -95,6 +99,46 @@ function ManagerDashboard() {
         document.title = 'Manager Dashboard - Villa';
         fetchDashboardData();
     }, [fetchDashboardData]);
+
+    const handleReportClick = async (reportId) => {
+        setLoadingTicket(true);
+        setIsModalOpen(true);
+
+        try {
+            const { data, error } = await supabase
+                .from('reports')
+                .select('*, organization:organizations(name)')
+                .eq('id', reportId)
+                .single();
+
+            if (error) throw error;
+
+            const fullTicket = {
+                ...data,
+                title: data.description && data.description.length > 50
+                    ? data.description.substring(0, 50) + '...'
+                    : data.description || 'No title',
+                date: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'Unknown date',
+                tenantName: data.tenant_name || 'Unknown tenant',
+                organizationName: data.organization?.name || 'Unknown Organization',
+            };
+
+            setSelectedTicket(fullTicket);
+        } catch (error) {
+            console.error('Error fetching ticket details:', error);
+        } finally {
+            setLoadingTicket(false);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedTicket(null);
+    };
 
     const nav = (
         <Nav navElements={[
@@ -263,7 +307,7 @@ function ManagerDashboard() {
                                 {recentReports.map((report, index) => (
                                     <div
                                         key={report.id}
-                                        onClick={() => navigate(`/manager/reports/${report.id}`)}
+                                        onClick={() => handleReportClick(report.id)}
                                         className="group p-4 -mx-2 rounded-xl cursor-pointer transition-all duration-300 hover:bg-secondary-50 hover:shadow-sm animate-fade-in-up"
                                         style={{animationDelay: `${index * 0.05}s`}}
                                     >
@@ -320,6 +364,14 @@ function ManagerDashboard() {
                     </Card.Content>
                 </Card>
             </div>
+
+            <TicketDetailModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                ticket={selectedTicket}
+                loading={loadingTicket}
+                canEditStatus={true}
+            />
         </div>
     );
 }
