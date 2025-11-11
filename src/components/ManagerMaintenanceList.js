@@ -26,9 +26,7 @@ function ManagerMaintenanceList({ tickets }) {
 
             const fullTicket = {
                 ...data,
-                title: data.description && data.description.length > 50
-                    ? data.description.substring(0, 50) + '...'
-                    : data.description || 'No title',
+                title: data.title || 'No title',
                 date: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',

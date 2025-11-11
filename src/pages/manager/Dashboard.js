@@ -72,6 +72,7 @@ function ManagerDashboard() {
             // Get recent 5 reports
             setRecentReports(reports.slice(0, 5).map(report => ({
                 id: report.id,
+                title: report.title || 'No title',
                 description: report.description && report.description.length > 60
                     ? report.description.substring(0, 60) + '...'
                     : report.description || 'No description',
@@ -112,9 +113,7 @@ function ManagerDashboard() {
 
             const fullTicket = {
                 ...data,
-                title: data.description && data.description.length > 50
-                    ? data.description.substring(0, 50) + '...'
-                    : data.description || 'No title',
+                title: data.title || 'No title',
                 date: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
@@ -323,12 +322,19 @@ function ManagerDashboard() {
                                                 <div className="flex items-start justify-between gap-4 mb-2">
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-sm font-semibold text-secondary-900 mb-1 group-hover:text-primary-600 transition-colors truncate">
+                                                            {report.title}
+                                                        </p>
+                                                        <p className="text-xs text-secondary-600 mb-1 truncate">
                                                             {report.description}
                                                         </p>
                                                         <div className="flex items-center gap-2 text-xs text-secondary-600">
                                                             <span className="font-medium">{report.tenant}</span>
-                                                            <span className="text-secondary-400">•</span>
-                                                            <span>Unit {report.unit}</span>
+                                                            {report.unit && (
+                                                                <>
+                                                                    <span className="text-secondary-400">•</span>
+                                                                    <span>Unit {report.unit}</span>
+                                                                </>
+                                                            )}
                                                             <span className="text-secondary-400">•</span>
                                                             <span>{report.organizationName}</span>
                                                             <span className="text-secondary-400">•</span>

@@ -85,16 +85,16 @@ function ManagerMaintenanceListPage() {
 
             const fetchedTickets = sortedData.map(report => ({
                 id: report.id,
-                title: report.description && report.description.length > 50
-                    ? report.description.substring(0, 50) + '...'
-                    : report.description || 'No title',
+                title: report.title || 'No title',
                 date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'
                 }) : 'Unknown date',
                 severity: report.severity || 'medium',
-                description: report.description || 'No description',
+                description: report.description && report.description.length > 50
+                    ? report.description.substring(0, 50) + '...'
+                    : report.description || 'No description',
                 tenantName: report.tenant_name || 'Unknown tenant',
                 property: report.unit || 'Unknown unit',
                 unit: report.unit,

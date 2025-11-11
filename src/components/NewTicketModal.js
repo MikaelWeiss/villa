@@ -14,9 +14,9 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
         const { user, profile } = useAuth();
     const [formData, setFormData] = useState({
         organization_id: '',
-        unit: '',
         title: '',
-        description: '',
+        wizardRoom: '',
+        wizardDescription: '',
         severity: 'medium'
     });
     const [organizations, setOrganizations] = useState([]);
@@ -128,8 +128,8 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.unit || !formData.title) {
-            setError('Unit number and issue are required');
+        if (!formData.title) {
+            setError('Title is required');
             return;
         }
 
@@ -148,8 +148,11 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                     tenant_id: user.id,
                     tenant_name: user.email || 'Unknown',
                     organization_id: formData.organization_id,
-                    unit: formData.unit,
-                    description: formData.title + '\n\n' + formData.description,
+                    unit: null,
+                    title: formData.title,
+                    description: formData.wizardRoom && formData.wizardDescription
+                        ? `${formData.wizardRoom}\n\n${formData.wizardDescription}`
+                        : formData.wizardDescription || '',
                     severity: formData.severity,
                     status: 'open',
                     image_urls: []
@@ -199,8 +202,8 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     const handleWizardComplete = (wizardData) => {
         setFormData(prev => ({
             ...prev,
-            title: `${wizardData.room}/${wizardData.item}`,
-            description: wizardData.description
+            wizardRoom: `${wizardData.room}/${wizardData.item}`,
+            wizardDescription: wizardData.description
         }));
         setWizardCompleted(true);
     };
@@ -239,11 +242,11 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                         )}
 
                         <Input
-                            label="Unit Number *"
-                            id="unit"
-                            placeholder="e.g., A-203, B-105"
+                            label="Title *"
+                            id="title"
+                            placeholder="Brief title for the issue"
                             type="text"
-                            value={formData.unit}
+                            value={formData.title}
                             onChange={handleInputChange}
                             required
                             disabled={loading}
@@ -253,8 +256,8 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                                                                                                     <div className={`py-12 ${wizardCompleted ? 'border-2 border-success-500 rounded-lg p-4' : ''}`}>
                                                                                                         {wizardCompleted ? (                                    <div>
                                         <h3 className='text-lg font-semibold text-success-700'>Issue Selected:</h3>
-                                        <p className='text-secondary-800 font-medium'>{formData.title}</p>
-                                        <p className='text-secondary-600'>{formData.description}</p>
+                                        <p className='text-secondary-800 font-medium'>{formData.wizardRoom}</p>
+                                        <p className='text-secondary-600'>{formData.wizardDescription}</p>
                                         <Button variant="outline" size="sm" onClick={() => setWizardCompleted(false)} className="mt-2">Change</Button>
                                     </div>
                                 ) : (
@@ -264,22 +267,11 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                         ) : (
                             <>
                                 <TextArea
-                                    label="What's Broken? *"
-                                    id="title"
-                                    placeholder="Brief summary of the issue..."
-                                    rows={3}
-                                    value={formData.title}
-                                    onChange={handleInputChange}
-                                    required
-                                    disabled={loading}
-                                />
-
-                                <TextArea
                                     label="Damage Description *"
-                                    id="description"
+                                    id="wizardDescription"
                                     placeholder="Please describe the damage in detail..."
                                     rows={4}
-                                    value={formData.description}
+                                    value={formData.wizardDescription}
                                     onChange={handleInputChange}
                                     required
                                     disabled={loading}

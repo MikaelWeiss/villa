@@ -134,10 +134,11 @@ function TenantReports() {
     // Transform reports data to match the UI component's expected format
     const formattedTickets = reports.map(report => ({
         id: report.id,
-        title: `Unit ${report.unit}`,
+        title: report.title || 'No title',
         date: new Date(report.created_at).toLocaleDateString(),
         severity: report.severity || 'medium',
         description: report.description,
+        unit: report.unit,
         image_urls: report.image_urls || [],
         status: report.status || 'open',
         created_at: report.created_at,
