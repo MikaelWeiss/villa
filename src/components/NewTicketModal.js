@@ -21,7 +21,6 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     });
     const [organizations, setOrganizations] = useState([]);
     const [wizardCompleted, setWizardCompleted] = useState(false);
-    const [showBackButton, setShowBackButton] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -105,7 +104,7 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                 const fileName = `${reportId}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
                 const filePath = `${user.id}/${fileName}`;
 
-                const { data, error: uploadError } = await supabase.storage
+                const { error: uploadError } = await supabase.storage
                     .from('damage-reports')
                     .upload(filePath, file);
 
@@ -259,7 +258,7 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                                         <Button variant="outline" size="sm" onClick={() => setWizardCompleted(false)} className="mt-2">Change</Button>
                                     </div>
                                 ) : (
-                                    <SvgReportWizard onComplete={handleWizardComplete} onPanelChange={setShowBackButton} />
+                                    <SvgReportWizard onComplete={handleWizardComplete} />
                                 )}
                             </div>
                         ) : (

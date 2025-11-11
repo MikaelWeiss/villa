@@ -114,7 +114,7 @@ function ManagerMaintenanceList({ tickets }) {
                             <img
                                 key={index}
                                 src={url}
-                                alt={`Report image ${index + 1}`}
+                                alt={`Attachment ${index + 1}`}
                                 className="w-full h-24 object-cover rounded-lg"
                             />
                         ))}

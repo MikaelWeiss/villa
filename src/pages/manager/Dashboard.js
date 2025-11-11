@@ -12,15 +12,12 @@ import {
     CheckCircle,
     Activity,
     TrendingUp,
-    TrendingDown,
     ArrowRight,
-    Calendar,
     Eye
 } from "lucide-react";
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';
-import StatCard from '../../components/ui/StatCard';
 import Badge from '../../components/ui/Badge';
 import TicketDetailModal from '../../components/TicketDetailModal';
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
 import ManagerMaintenanceList from "../../components/ManagerMaintenanceList";
-import {Wrench, LayoutDashboard, Users, Calendar} from "lucide-react";
+import {Wrench, LayoutDashboard, Users} from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';

@@ -21,21 +21,6 @@ function TicketDetailModal({ isOpen, onClose, ticket, loading, canEditStatus = f
 
     if (!ticket && !loading) return null;
 
-    const getSeverityColor = (severity) => {
-        switch (severity) {
-            case 'urgent':
-                return 'bg-red-100 text-red-800 border-red-200';
-            case 'high':
-                return 'bg-orange-100 text-orange-800 border-orange-200';
-            case 'medium':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            case 'low':
-                return 'bg-green-100 text-green-800 border-green-200';
-            default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
-        }
-    };
-
     const getStatusColor = (status) => {
         switch (status) {
             case 'open':
@@ -222,7 +207,7 @@ function TicketDetailModal({ isOpen, onClose, ticket, loading, canEditStatus = f
                                     <div key={index} className="relative group">
                                         <img
                                             src={url}
-                                            alt={`Report image ${index + 1}`}
+                                            alt={`Attachment ${index + 1}`}
                                             className="w-full h-32 object-cover rounded-lg border border-secondary-200 cursor-pointer hover:shadow-md transition-shadow"
                                             onClick={() => window.open(url, '_blank')}
                                         />
