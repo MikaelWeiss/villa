@@ -12,19 +12,17 @@ import {
     CheckCircle,
     Activity,
     TrendingUp,
-    TrendingDown,
     ArrowRight,
-    Calendar,
     Eye
 } from "lucide-react";
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';
-import StatCard from '../../components/ui/StatCard';
 import Badge from '../../components/ui/Badge';
+import TicketDetailModal from '../../components/TicketDetailModal';
 
 function ManagerDashboard() {
-    const { signOut, profile, role } = useAuth();
+    const { profile, role } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -35,6 +33,9 @@ function ManagerDashboard() {
         tenantCount: 0
     });
     const [recentReports, setRecentReports] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [loadingTicket, setLoadingTicket] = useState(false);
 
     const fetchDashboardData = useCallback(async () => {
         if (role && !profile) return;
@@ -71,6 +72,7 @@ function ManagerDashboard() {
             // Get recent 5 reports
             setRecentReports(reports.slice(0, 5).map(report => ({
                 id: report.id,
+                title: report.title || 'No title',
                 description: report.description && report.description.length > 60
                     ? report.description.substring(0, 60) + '...'
                     : report.description || 'No description',
@@ -95,6 +97,44 @@ function ManagerDashboard() {
         document.title = 'Manager Dashboard - Villa';
         fetchDashboardData();
     }, [fetchDashboardData]);
+
+    const handleReportClick = async (reportId) => {
+        setLoadingTicket(true);
+        setIsModalOpen(true);
+
+        try {
+            const { data, error } = await supabase
+                .from('reports')
+                .select('*, organization:organizations(name)')
+                .eq('id', reportId)
+                .single();
+
+            if (error) throw error;
+
+            const fullTicket = {
+                ...data,
+                title: data.title || 'No title',
+                date: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'Unknown date',
+                tenantName: data.tenant_name || 'Unknown tenant',
+                organizationName: data.organization?.name || 'Unknown Organization',
+            };
+
+            setSelectedTicket(fullTicket);
+        } catch (error) {
+            console.error('Error fetching ticket details:', error);
+        } finally {
+            setLoadingTicket(false);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedTicket(null);
+    };
 
     const nav = (
         <Nav navElements={[
@@ -128,7 +168,6 @@ function ManagerDashboard() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="Manager Dashboard"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-secondary-600">Loading dashboard...</p>
                 </div>
@@ -142,13 +181,6 @@ function ManagerDashboard() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="Dashboard"
-                    actions={
-                        <div className="flex items-center gap-3">
-                            <Button variant="danger" onClick={signOut} size="sm">
-                                Sign Out
-                            </Button>
-                        </div>
-                    }
                 />
 
                 {/* Welcome Section */}
@@ -263,7 +295,7 @@ function ManagerDashboard() {
                                 {recentReports.map((report, index) => (
                                     <div
                                         key={report.id}
-                                        onClick={() => navigate(`/manager/reports/${report.id}`)}
+                                        onClick={() => handleReportClick(report.id)}
                                         className="group p-4 -mx-2 rounded-xl cursor-pointer transition-all duration-300 hover:bg-secondary-50 hover:shadow-sm animate-fade-in-up"
                                         style={{animationDelay: `${index * 0.05}s`}}
                                     >
@@ -282,12 +314,19 @@ function ManagerDashboard() {
                                                 <div className="flex items-start justify-between gap-4 mb-2">
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-sm font-semibold text-secondary-900 mb-1 group-hover:text-primary-600 transition-colors truncate">
+                                                            {report.title}
+                                                        </p>
+                                                        <p className="text-xs text-secondary-600 mb-1 truncate">
                                                             {report.description}
                                                         </p>
                                                         <div className="flex items-center gap-2 text-xs text-secondary-600">
                                                             <span className="font-medium">{report.tenant}</span>
-                                                            <span className="text-secondary-400">•</span>
-                                                            <span>Unit {report.unit}</span>
+                                                            {report.unit && (
+                                                                <>
+                                                                    <span className="text-secondary-400">•</span>
+                                                                    <span>Unit {report.unit}</span>
+                                                                </>
+                                                            )}
                                                             <span className="text-secondary-400">•</span>
                                                             <span>{report.organizationName}</span>
                                                             <span className="text-secondary-400">•</span>
@@ -320,6 +359,14 @@ function ManagerDashboard() {
                     </Card.Content>
                 </Card>
             </div>
+
+            <TicketDetailModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                ticket={selectedTicket}
+                loading={loadingTicket}
+                canEditStatus={true}
+            />
         </div>
     );
 }

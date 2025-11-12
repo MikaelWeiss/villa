@@ -16,7 +16,7 @@ function TenantDashboard() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const { signOut, user } = useAuth();
+    const { user } = useAuth();
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -69,10 +69,11 @@ function TenantDashboard() {
     // Transform reports data to match the UI component's expected format
     const formattedTickets = reports.map(report => ({
         id: report.id,
-        title: `Unit ${report.unit}`,
+        title: report.title || 'No title',
         date: new Date(report.created_at).toLocaleDateString(),
         severity: report.severity || 'medium',
         description: report.description,
+        unit: report.unit,
         image_urls: report.image_urls || [],
         status: report.status || 'open'
     }));
@@ -99,19 +100,14 @@ function TenantDashboard() {
                 <PageHeader
                     title="Dashboard"
                     actions={
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="primary"
-                                size="sm"
-                                leftIcon={<Plus />}
-                                onClick={() => setIsOpen(true)}
-                            >
-                                New Request
-                            </Button>
-                            <Button variant="danger" onClick={signOut} size="sm">
-                                Sign Out
-                            </Button>
-                        </div>
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            leftIcon={<Plus />}
+                            onClick={() => setIsOpen(true)}
+                        >
+                            New Request
+                        </Button>
                     }
                 />
 

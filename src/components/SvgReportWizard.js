@@ -11,7 +11,9 @@ function SvgReportWizard({ onComplete, onPanelChange }) {
     const floorPlanHtml = useMemo(() => getFloorPlan(), []);
 
     useEffect(() => {
-        onPanelChange(panelIndex > 0);
+        if (onPanelChange) {
+            onPanelChange(panelIndex > 0);
+        }
     }, [panelIndex, onPanelChange]);
 
     function getDamageOptions(element) {

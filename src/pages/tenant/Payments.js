@@ -8,8 +8,6 @@ import PageHeader from '../../components/ui/PageHeader';
 import EmptyState from '../../components/ui/EmptyState';
 
 function TenantPayments() {
-    const { signOut } = useAuth();
-
     React.useEffect(() => {
         document.title = 'Payments - Villa';
     }, []);
@@ -43,11 +41,6 @@ function TenantPayments() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="Payments"
-                    actions={
-                        <Button variant="danger" onClick={signOut}>
-                            Sign Out
-                        </Button>
-                    }
                 />
 
                 <Card className="mb-6">

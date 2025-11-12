@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import Modal from './ui/Modal';
@@ -13,17 +13,52 @@ const useSvgForm = true;
 function NewTicketModal({ setIsOpen, onReportCreated }) {
         const { user, profile } = useAuth();
     const [formData, setFormData] = useState({
-        unit: '',
+        organization_id: '',
         title: '',
-        description: '',
+        wizardRoom: '',
+        wizardDescription: '',
         severity: 'medium'
     });
+    const [organizations, setOrganizations] = useState([]);
     const [wizardCompleted, setWizardCompleted] = useState(false);
-    const [showBackButton, setShowBackButton] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchOrganizations = async () => {
+            if (!profile?.organization_ids || profile.organization_ids.length === 0) {
+                setError('You must be assigned to an organization to create tickets. Please contact your administrator.');
+                return;
+            }
+
+            try {
+                const { data, error: fetchError } = await supabase
+                    .from('organizations')
+                    .select('id, name')
+                    .in('id', profile.organization_ids);
+
+                if (fetchError) {
+                    throw fetchError;
+                }
+
+                setOrganizations(data || []);
+
+                if (data && data.length === 1) {
+                    setFormData(prev => ({
+                        ...prev,
+                        organization_id: data[0].id
+                    }));
+                }
+            } catch (err) {
+                setError('Failed to load organizations. Please try again.');
+                console.error('Error fetching organizations:', err);
+            }
+        };
+
+        fetchOrganizations();
+    }, [profile]);
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -69,7 +104,7 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                 const fileName = `${reportId}/${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
                 const filePath = `${user.id}/${fileName}`;
 
-                const { data, error: uploadError } = await supabase.storage
+                const { error: uploadError } = await supabase.storage
                     .from('damage-reports')
                     .upload(filePath, file);
 
@@ -93,8 +128,13 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.unit || !formData.title) {
-            setError('Unit number and issue are required');
+        if (!formData.title) {
+            setError('Title is required');
+            return;
+        }
+
+        if (!formData.organization_id) {
+            setError('Organization is required');
             return;
         }
 
@@ -107,8 +147,12 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                 .insert([{
                     tenant_id: user.id,
                     tenant_name: user.email || 'Unknown',
-                    unit: formData.unit,
-                    description: formData.title + '\n\n' + formData.description,
+                    organization_id: formData.organization_id,
+                    unit: null,
+                    title: formData.title,
+                    description: formData.wizardRoom && formData.wizardDescription
+                        ? `${formData.wizardRoom}\n\n${formData.wizardDescription}`
+                        : formData.wizardDescription || '',
                     severity: formData.severity,
                     status: 'open',
                     image_urls: []
@@ -158,8 +202,8 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
     const handleWizardComplete = (wizardData) => {
         setFormData(prev => ({
             ...prev,
-            title: `${wizardData.room}/${wizardData.item}`,
-            description: wizardData.description
+            wizardRoom: `${wizardData.room}/${wizardData.item}`,
+            wizardDescription: wizardData.description
         }));
         setWizardCompleted(true);
     };
@@ -179,12 +223,30 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                     )}
 
                     <div className="space-y-4">
+                        {organizations.length > 1 && (
+                            <Select
+                                label="Organization *"
+                                id="organization_id"
+                                value={formData.organization_id}
+                                onChange={handleInputChange}
+                                disabled={loading}
+                                required
+                            >
+                                <option value="">Select an organization</option>
+                                {organizations.map(org => (
+                                    <option key={org.id} value={org.id}>
+                                        {org.name}
+                                    </option>
+                                ))}
+                            </Select>
+                        )}
+
                         <Input
-                            label="Unit Number *"
-                            id="unit"
-                            placeholder="e.g., A-203, B-105"
+                            label="Title *"
+                            id="title"
+                            placeholder="Brief title for the issue"
                             type="text"
-                            value={formData.unit}
+                            value={formData.title}
                             onChange={handleInputChange}
                             required
                             disabled={loading}
@@ -194,33 +256,22 @@ function NewTicketModal({ setIsOpen, onReportCreated }) {
                                                                                                     <div className={`py-12 ${wizardCompleted ? 'border-2 border-success-500 rounded-lg p-4' : ''}`}>
                                                                                                         {wizardCompleted ? (                                    <div>
                                         <h3 className='text-lg font-semibold text-success-700'>Issue Selected:</h3>
-                                        <p className='text-secondary-800 font-medium'>{formData.title}</p>
-                                        <p className='text-secondary-600'>{formData.description}</p>
+                                        <p className='text-secondary-800 font-medium'>{formData.wizardRoom}</p>
+                                        <p className='text-secondary-600'>{formData.wizardDescription}</p>
                                         <Button variant="outline" size="sm" onClick={() => setWizardCompleted(false)} className="mt-2">Change</Button>
                                     </div>
                                 ) : (
-                                    <SvgReportWizard onComplete={handleWizardComplete} onPanelChange={setShowBackButton} />
+                                    <SvgReportWizard onComplete={handleWizardComplete} />
                                 )}
                             </div>
                         ) : (
                             <>
                                 <TextArea
-                                    label="What's Broken? *"
-                                    id="title"
-                                    placeholder="Brief summary of the issue..."
-                                    rows={3}
-                                    value={formData.title}
-                                    onChange={handleInputChange}
-                                    required
-                                    disabled={loading}
-                                />
-
-                                <TextArea
                                     label="Damage Description *"
-                                    id="description"
+                                    id="wizardDescription"
                                     placeholder="Please describe the damage in detail..."
                                     rows={4}
-                                    value={formData.description}
+                                    value={formData.wizardDescription}
                                     onChange={handleInputChange}
                                     required
                                     disabled={loading}
