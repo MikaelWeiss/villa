@@ -9,7 +9,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import Input from '../../components/ui/Input';
 
 function ManagerTenantsPage() {
-    const { signOut, profile, role } = useAuth();
+    const { profile, role } = useAuth();
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -166,7 +166,6 @@ function ManagerTenantsPage() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="Tenants"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-secondary-600">Loading tenants...</p>
                 </div>
@@ -181,7 +180,6 @@ function ManagerTenantsPage() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="Tenants"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-error-600">{error}</p>
                 </div>
@@ -195,7 +193,6 @@ function ManagerTenantsPage() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="Tenants"
-                    actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                 />
                 {tenants.length === 0 ? (
                     <EmptyState

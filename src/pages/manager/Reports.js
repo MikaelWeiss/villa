@@ -10,7 +10,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import Select from '../../components/ui/Select';
 
 function ManagerMaintenanceListPage() {
-    const { signOut, profile, role } = useAuth();
+    const { profile, role } = useAuth();
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -211,7 +211,6 @@ function ManagerMaintenanceListPage() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="All Maintenance Requests"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-secondary-600">Loading maintenance requests...</p>
                 </div>
@@ -226,7 +225,6 @@ function ManagerMaintenanceListPage() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="All Maintenance Requests"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-error-600">{error}</p>
                 </div>
@@ -240,17 +238,15 @@ function ManagerMaintenanceListPage() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="All Maintenance Requests"
-                    actions=
-                        {<div className="flex items-center gap-4">
-                            <Select value={dayRange} onChange={handleDayRangeChange}>
-                                {dayRangeOptions.map(option => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Select>
-                            <Button variant="danger" onClick={signOut}>Sign Out</Button>
-                        </div>}
+                    actions={
+                        <Select value={dayRange} onChange={handleDayRangeChange}>
+                            {dayRangeOptions.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </Select>
+                    }
                 />
                 {tickets.length === 0 ? (
                     <EmptyState

@@ -22,7 +22,7 @@ import Badge from '../../components/ui/Badge';
 import TicketDetailModal from '../../components/TicketDetailModal';
 
 function ManagerDashboard() {
-    const { signOut, profile, role } = useAuth();
+    const { profile, role } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -168,7 +168,6 @@ function ManagerDashboard() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="Manager Dashboard"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-secondary-600">Loading dashboard...</p>
                 </div>
@@ -182,13 +181,6 @@ function ManagerDashboard() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="Dashboard"
-                    actions={
-                        <div className="flex items-center gap-3">
-                            <Button variant="danger" onClick={signOut} size="sm">
-                                Sign Out
-                            </Button>
-                        </div>
-                    }
                 />
 
                 {/* Welcome Section */}

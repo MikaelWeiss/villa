@@ -16,7 +16,7 @@ function TenantDashboard() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const { signOut, user } = useAuth();
+    const { user } = useAuth();
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -100,19 +100,14 @@ function TenantDashboard() {
                 <PageHeader
                     title="Dashboard"
                     actions={
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="primary"
-                                size="sm"
-                                leftIcon={<Plus />}
-                                onClick={() => setIsOpen(true)}
-                            >
-                                New Request
-                            </Button>
-                            <Button variant="danger" onClick={signOut} size="sm">
-                                Sign Out
-                            </Button>
-                        </div>
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            leftIcon={<Plus />}
+                            onClick={() => setIsOpen(true)}
+                        >
+                            New Request
+                        </Button>
                     }
                 />
 

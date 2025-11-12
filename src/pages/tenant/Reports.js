@@ -9,7 +9,7 @@ import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
 
 function TenantReports() {
-    const { signOut, user } = useAuth();
+    const { user } = useAuth();
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedTicket, setSelectedTicket] = useState(null);
@@ -156,11 +156,6 @@ function TenantReports() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="Maintenance"
-                    actions={
-                        <Button variant="danger" onClick={signOut}>
-                            Sign Out
-                        </Button>
-                    }
                 />
                 {loading ? (
                     <p className="text-secondary-500">Loading...</p>

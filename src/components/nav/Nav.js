@@ -1,11 +1,15 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import NavElement from "./NavElement";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Building2, User } from "lucide-react";
+import UserProfileModal from "../UserProfileModal";
 
 function Nav({ navElements }) {
     const { user, role } = useAuth();
     const navigate = useNavigate();
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     // Get user initials for avatar
     const getUserInitials = () => {
@@ -25,56 +29,67 @@ function Nav({ navElements }) {
     };
 
     return (
-        <nav className="fixed w-315 h-screen bg-white border-r border-secondary-100 flex flex-col shadow-sm">
-            {/* Logo and Brand */}
-            <div className="px-6 py-6 border-b border-secondary-100">
-                <button
-                    onClick={handleLogoClick}
-                    className="flex items-center gap-3 w-full cursor-pointer hover:opacity-80 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg p-1 -m-1"
-                    aria-label="Go to dashboard"
-                >
-                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-md">
-                        <Building2 size={24} className="text-white" />
-                    </div>
-                    <div className="text-left">
-                        <h1 className="text-xl font-bold text-secondary-900 leading-none mb-0.5">Villa</h1>
-                        <p className="text-xs text-secondary-500 capitalize leading-none">
-                            {role || 'User'} Portal
-                        </p>
-                    </div>
-                </button>
-            </div>
-
-            {/* Navigation Items */}
-            <ul className="flex flex-col flex-1 m-0 list-none gap-1 px-3 py-4 overflow-y-auto scrollbar-thin">
-                {navElements.map((element) => (
-                    <NavElement key={element.id} elementInfo={element} />
-                ))}
-            </ul>
-
-            {/* User Profile Section */}
-            <div className="px-4 py-4 border-t border-secondary-100 bg-secondary-25">
-                <div className="flex items-center gap-3 px-2">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 text-white font-semibold text-sm shadow-sm flex-shrink-0">
-                        {getUserInitials()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-secondary-900 truncate">
-                            {user?.email?.split('@')[0] || 'User'}
-                        </p>
-                        <p className="text-xs text-secondary-500 truncate">
-                            {user?.email || 'No email'}
-                        </p>
-                    </div>
+        <>
+            <nav className="fixed w-315 h-screen bg-white border-r border-secondary-100 flex flex-col shadow-sm">
+                {/* Logo and Brand */}
+                <div className="px-6 py-6 border-b border-secondary-100">
                     <button
-                        className="flex-shrink-0 p-1.5 rounded-lg hover:bg-secondary-100 transition-colors"
-                        aria-label="User menu"
+                        onClick={handleLogoClick}
+                        className="flex items-center gap-3 w-full cursor-pointer hover:opacity-80 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg p-1 -m-1"
+                        aria-label="Go to dashboard"
                     >
-                        <User size={18} className="text-secondary-400" />
+                        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-md">
+                            <Building2 size={24} className="text-white" />
+                        </div>
+                        <div className="text-left">
+                            <h1 className="text-xl font-bold text-secondary-900 leading-none mb-0.5">Villa</h1>
+                            <p className="text-xs text-secondary-500 capitalize leading-none">
+                                {role || 'User'} Portal
+                            </p>
+                        </div>
                     </button>
                 </div>
-            </div>
-        </nav>
+
+                {/* Navigation Items */}
+                <ul className="flex flex-col flex-1 m-0 list-none gap-1 px-3 py-4 overflow-y-auto scrollbar-thin">
+                    {navElements.map((element) => (
+                        <NavElement key={element.id} elementInfo={element} />
+                    ))}
+                </ul>
+
+                {/* User Profile Section */}
+                <div className="px-4 py-4 border-t border-secondary-100 bg-secondary-25">
+                    <button
+                        className="flex items-center gap-3 px-2 w-full rounded-lg hover:bg-secondary-100 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                        onClick={() => setIsProfileModalOpen(true)}
+                        aria-label="Open user profile"
+                    >
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 text-white font-semibold text-sm shadow-sm flex-shrink-0">
+                            {getUserInitials()}
+                        </div>
+                        <div className="flex-1 min-w-0 text-left">
+                            <p className="text-sm font-medium text-secondary-900 truncate">
+                                {user?.email?.split('@')[0] || 'User'}
+                            </p>
+                            <p className="text-xs text-secondary-500 truncate">
+                                {user?.email || 'No email'}
+                            </p>
+                        </div>
+                        <div className="flex-shrink-0 p-1.5">
+                            <User size={18} className="text-secondary-400" />
+                        </div>
+                    </button>
+                </div>
+            </nav>
+
+            {createPortal(
+                <UserProfileModal
+                    isOpen={isProfileModalOpen}
+                    onClose={() => setIsProfileModalOpen(false)}
+                />,
+                document.body
+            )}
+        </>
     );
 }
 
