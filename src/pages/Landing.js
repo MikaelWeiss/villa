@@ -53,7 +53,8 @@ export default function LandingPage() {
                 </Link>
               )}
               <Link to="/quote">
-                <Button size="sm" leftIcon={<Sparkles />}>
+                {/* <Button size="sm" leftIcon={<Sparkles />}> */}
+                <Button size="sm">
                   Get Started
                 </Button>
               </Link>
@@ -67,7 +68,7 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="max-w-6xl mx-auto px-6 lg:px-8 py-20 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 text-primary-700 text-sm font-medium mb-8 animate-fade-in-down">
-            <Sparkles size={16} />
+            {/* <Sparkles size={16} /> */}
             <span>Modern maintenance management</span>
           </div>
 
