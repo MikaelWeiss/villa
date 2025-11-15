@@ -207,3 +207,7 @@
     animation: fade-in-up 0.3s ease-out;
   }
 }
+
+span.block.bg-gradient-to-r.from-primary-600.to-accent-500.bg-clip-text.text-transparent {
+    padding-bottom: 10px;
+}

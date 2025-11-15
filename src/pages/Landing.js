@@ -97,7 +97,7 @@ export default function LandingPage() {
           </div>
 
           {/* Social Proof */}
-          <div className="mt-16 pt-8 border-t border-secondary-200 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+          {/* <div className="mt-16 pt-8 border-t border-secondary-200 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
             <p className="text-sm text-secondary-500 mb-6">Trusted by property managers nationwide</p>
             <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
               {[1, 2, 3, 4].map((i) => (
@@ -107,7 +107,7 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </section>
 
         {/* Features Grid */}
