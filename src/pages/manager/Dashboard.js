@@ -163,14 +163,10 @@ function ManagerDashboard() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                    <Card variant="elevated" padding="lg" className="">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-md">
                                 <Activity size={24} />
-                            </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-success-600">
-                                <TrendingUp size={14} />
-                                <span>12%</span>
                             </div>
                         </div>
                         <p className="text-sm font-medium text-secondary-600 mb-1">Total Reports</p>
@@ -178,25 +174,21 @@ function ManagerDashboard() {
                         <p className="text-xs text-secondary-500 mt-2">All time</p>
                     </Card>
 
-                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                    <Card variant="elevated" padding="lg" className="">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-error-500 to-error-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-error-500 to-error-600 text-white shadow-md">
                                 <AlertCircle size={24} />
                             </div>
-                            {stats.open > 0 && (
-                                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-error-50 text-error-700 text-xs font-semibold animate-pulse-subtle">
-                                    Needs attention
-                                </div>
-                            )}
+
                         </div>
                         <p className="text-sm font-medium text-secondary-600 mb-1">Open</p>
                         <p className="text-3xl font-bold text-secondary-900">{stats.open}</p>
                         <p className="text-xs text-secondary-500 mt-2">Requires action</p>
                     </Card>
 
-                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                    <Card variant="elevated" padding="lg" className="">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-warning-500 to-warning-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-warning-500 to-warning-600 text-white shadow-md">
                                 <Clock size={24} />
                             </div>
                         </div>
@@ -205,24 +197,21 @@ function ManagerDashboard() {
                         <p className="text-xs text-secondary-500 mt-2">Being resolved</p>
                     </Card>
 
-                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                    <Card variant="elevated" padding="lg" className="">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-success-500 to-success-600 text-white shadow-md">
                                 <CheckCircle size={24} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-success-600">
-                                <TrendingUp size={14} />
-                                <span>8%</span>
-                            </div>
+
                         </div>
                         <p className="text-sm font-medium text-secondary-600 mb-1">Resolved</p>
                         <p className="text-3xl font-bold text-secondary-900">{stats.resolved}</p>
                         <p className="text-xs text-secondary-500 mt-2">This month</p>
                     </Card>
 
-                    <Card variant="elevated" padding="lg" className="group hover:shadow-xl transition-all duration-300">
+                    <Card variant="elevated" padding="lg" className="">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-md">
                                 <Users size={24} />
                             </div>
                         </div>
@@ -264,7 +253,7 @@ function ManagerDashboard() {
                                     <div
                                         key={report.id}
                                         onClick={() => navigate(`/manager/reports/${report.id}`)}
-                                        className="group p-4 -mx-2 rounded-xl cursor-pointer transition-all duration-300 hover:bg-secondary-50 hover:shadow-sm animate-fade-in-up"
+                                        className="p-4 -mx-2 rounded-xl cursor-pointer transition-all duration-300 animate-fade-in-up"
                                         style={{animationDelay: `${index * 0.05}s`}}
                                     >
                                         <div className="flex items-start gap-4">
@@ -281,7 +270,7 @@ function ManagerDashboard() {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between gap-4 mb-2">
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-semibold text-secondary-900 mb-1 group-hover:text-primary-600 transition-colors truncate">
+                                                        <p className="text-sm font-semibold text-secondary-900 mb-1 truncate">
                                                             {report.description}
                                                         </p>
                                                         <div className="flex items-center gap-2 text-xs text-secondary-600">
@@ -298,7 +287,7 @@ function ManagerDashboard() {
                                                         variant="ghost-secondary"
                                                         size="xs"
                                                         leftIcon={<Eye />}
-                                                        className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                                                        className="opacity-0 transition-opacity flex-shrink-0"
                                                     >
                                                         View
                                                     </Button>
