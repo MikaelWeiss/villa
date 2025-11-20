@@ -1,26 +1,20 @@
-name: Deploy to Server
-
+name: Deploy React App
 on:
   push:
-    branches:
-      - main
-
+    branches: [ main ]
 jobs:
-  deploy:
-    runs-on: self-hosted
-
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Copy environment file
-        run: cp /home/mikaelweiss/code/web/villa/.env .env
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: CI=false npm run build
-
-      - name: Reload PM2
-        run: pm2 reload villareports
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm ci
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
