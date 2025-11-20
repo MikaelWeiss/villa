@@ -39,6 +39,9 @@ function TenantMaintenanceList({ tickets, onTicketClick }) {
                     <Badge variant={ticket.severity}>
                         {ticket.severity}
                     </Badge>
+                    <Badge variant={ticket.status || 'open'}>
+                        {(ticket.status || 'open').replace('_', ' ')}
+                    </Badge>
                 </div>
                 <p className="text-secondary-700 mb-3 line-clamp-3">{ticket.description}</p>
                 {ticket.image_urls && ticket.image_urls.length > 0 && (
@@ -47,7 +50,7 @@ function TenantMaintenanceList({ tickets, onTicketClick }) {
                             <img
                                 key={index}
                                 src={url}
-                                alt={`Report image ${index + 1}`}
+                                alt={`Attachment ${index + 1}`}
                                 className="w-full h-24 object-cover rounded-lg"
                             />
                         ))}

@@ -9,7 +9,7 @@ import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
 
 function TenantReports() {
-    const { signOut, user } = useAuth();
+    const { user } = useAuth();
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedTicket, setSelectedTicket] = useState(null);
@@ -21,11 +21,31 @@ function TenantReports() {
             const { data, error } = await supabase
                 .from('reports')
                 .select('*')
-                .eq('tenant_id', user.id)
-                .order('created_at', { ascending: false });
+                .eq('tenant_id', user.id);
 
             if (error) throw error;
-            setReports(data || []);
+
+            const statusPriority = {
+                'open': 1,
+                'in_progress': 2,
+                'closed': 3,
+                'cancelled': 4
+            };
+
+            const sortedData = (data || []).sort((a, b) => {
+                const statusA = statusPriority[a.status] || 999;
+                const statusB = statusPriority[b.status] || 999;
+
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+
+                const dateA = new Date(a.updated_at || a.created_at);
+                const dateB = new Date(b.updated_at || b.created_at);
+                return dateB - dateA;
+            });
+
+            setReports(sortedData);
         } catch (error) {
             // Error fetching reports - fail silently and show empty state
         } finally {
@@ -37,6 +57,56 @@ function TenantReports() {
         document.title = 'Maintenance - Villa';
         fetchReports();
     }, [fetchReports]);
+
+    useEffect(() => {
+        if (!user) return;
+
+        const statusPriority = {
+            'open': 1,
+            'in_progress': 2,
+            'closed': 3,
+            'cancelled': 4
+        };
+
+        const sortReports = (reports) => {
+            return [...reports].sort((a, b) => {
+                const statusA = statusPriority[a.status] || 999;
+                const statusB = statusPriority[b.status] || 999;
+
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+
+                const dateA = new Date(a.updated_at || a.created_at);
+                const dateB = new Date(b.updated_at || b.created_at);
+                return dateB - dateA;
+            });
+        };
+
+        const channel = supabase
+            .channel('tenant-reports-changes')
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'reports',
+                filter: `tenant_id=eq.${user.id}`
+            }, (payload) => {
+                if (payload.eventType === 'INSERT') {
+                    setReports(prev => sortReports([payload.new, ...prev]));
+                } else if (payload.eventType === 'UPDATE') {
+                    setReports(prev => sortReports(prev.map(report =>
+                        report.id === payload.new.id ? payload.new : report
+                    )));
+                } else if (payload.eventType === 'DELETE') {
+                    setReports(prev => prev.filter(report => report.id !== payload.old.id));
+                }
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [user]);
 
     const nav = (
         <Nav navElements={[
@@ -64,10 +134,11 @@ function TenantReports() {
     // Transform reports data to match the UI component's expected format
     const formattedTickets = reports.map(report => ({
         id: report.id,
-        title: `Unit ${report.unit}`,
+        title: report.title || 'No title',
         date: new Date(report.created_at).toLocaleDateString(),
         severity: report.severity || 'medium',
         description: report.description,
+        unit: report.unit,
         image_urls: report.image_urls || [],
         status: report.status || 'open',
         created_at: report.created_at,
@@ -85,11 +156,6 @@ function TenantReports() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="Maintenance"
-                    actions={
-                        <Button variant="danger" onClick={signOut}>
-                            Sign Out
-                        </Button>
-                    }
                 />
                 {loading ? (
                     <p className="text-secondary-500">Loading...</p>

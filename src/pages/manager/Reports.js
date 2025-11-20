@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
 import ManagerMaintenanceList from "../../components/ManagerMaintenanceList";
-import {Wrench, LayoutDashboard, Users, Calendar} from "lucide-react";
+import {Wrench, LayoutDashboard, Users} from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
@@ -10,7 +10,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import Select from '../../components/ui/Select';
 
 function ManagerMaintenanceListPage() {
-    const { signOut, profile, role } = useAuth();
+    const { profile, role } = useAuth();
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -59,30 +59,50 @@ function ManagerMaintenanceListPage() {
                 query = query.gte('created_at', startDate.toISOString());
             }
 
-            query = query.order('created_at', { ascending: false });
-
             const { data, error: fetchError } = await query;
 
             if (fetchError) throw fetchError;
 
-            const fetchedTickets = data.map(report => ({
+            const statusPriority = {
+                'open': 1,
+                'in_progress': 2,
+                'closed': 3,
+                'cancelled': 4
+            };
+
+            const sortedData = data.sort((a, b) => {
+                const statusA = statusPriority[a.status] || 999;
+                const statusB = statusPriority[b.status] || 999;
+
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+
+                const dateA = new Date(a.updated_at || a.created_at);
+                const dateB = new Date(b.updated_at || b.created_at);
+                return dateB - dateA;
+            });
+
+            const fetchedTickets = sortedData.map(report => ({
                 id: report.id,
-                title: report.description && report.description.length > 50
-                    ? report.description.substring(0, 50) + '...'
-                    : report.description || 'No title',
+                title: report.title || 'No title',
                 date: report.created_at ? new Date(report.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'
                 }) : 'Unknown date',
                 severity: report.severity || 'medium',
-                description: report.description || 'No description',
+                description: report.description && report.description.length > 50
+                    ? report.description.substring(0, 50) + '...'
+                    : report.description || 'No description',
                 tenantName: report.tenant_name || 'Unknown tenant',
                 property: report.unit || 'Unknown unit',
                 unit: report.unit,
                 status: report.status || 'open',
                 image_urls: report.image_urls || [],
                 organizationName: report.organization?.name || 'Unknown Organization',
+                created_at: report.created_at,
+                updated_at: report.updated_at,
             }));
 
             setTickets(fetchedTickets);
@@ -99,6 +119,28 @@ function ManagerMaintenanceListPage() {
     }, [fetchReports]);
 
     useEffect(() => {
+        const statusPriority = {
+            'open': 1,
+            'in_progress': 2,
+            'closed': 3,
+            'cancelled': 4
+        };
+
+        const sortTickets = (tickets) => {
+            return [...tickets].sort((a, b) => {
+                const statusA = statusPriority[a.status] || 999;
+                const statusB = statusPriority[b.status] || 999;
+
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+
+                const dateA = new Date(a.updated_at || a.created_at);
+                const dateB = new Date(b.updated_at || b.created_at);
+                return dateB - dateA;
+            });
+        };
+
         const transformReportToTicket = (report) => ({
             id: report.id,
             title: report.description && report.description.length > 50
@@ -117,6 +159,8 @@ function ManagerMaintenanceListPage() {
             status: report.status || 'open',
             image_urls: report.image_urls || [],
             organizationName: report.organization?.name || 'Unknown Organization',
+            created_at: report.created_at,
+            updated_at: report.updated_at,
         });
 
         const channel = supabase
@@ -128,12 +172,12 @@ function ManagerMaintenanceListPage() {
 
                 if (payload.eventType === 'INSERT') {
                     const newTicket = transformReportToTicket(payload.new);
-                    setTickets(prev => [newTicket, ...prev]);
+                    setTickets(prev => sortTickets([newTicket, ...prev]));
                 } else if (payload.eventType === 'UPDATE') {
                     const updatedTicket = transformReportToTicket(payload.new);
-                    setTickets(prev => prev.map(ticket =>
+                    setTickets(prev => sortTickets(prev.map(ticket =>
                         ticket.id === updatedTicket.id ? updatedTicket : ticket
-                    ));
+                    )));
                 } else if (payload.eventType === 'DELETE') {
                     setTickets(prev => prev.filter(ticket => ticket.id !== payload.old.id));
                 }
@@ -167,7 +211,6 @@ function ManagerMaintenanceListPage() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="All Maintenance Requests"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-secondary-600">Loading maintenance requests...</p>
                 </div>
@@ -182,7 +225,6 @@ function ManagerMaintenanceListPage() {
                 <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                     <PageHeader
                         title="All Maintenance Requests"
-                        actions={<Button variant="danger" onClick={signOut}>Sign Out</Button>}
                     />
                     <p className="text-error-600">{error}</p>
                 </div>
@@ -196,17 +238,15 @@ function ManagerMaintenanceListPage() {
             <div className="ml-315 p-10 bg-background min-h-screen flex-1">
                 <PageHeader
                     title="All Maintenance Requests"
-                    actions=
-                        {<div className="flex items-center gap-4">
-                            <Select value={dayRange} onChange={handleDayRangeChange}>
-                                {dayRangeOptions.map(option => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Select>
-                            <Button variant="danger" onClick={signOut}>Sign Out</Button>
-                        </div>}
+                    actions={
+                        <Select value={dayRange} onChange={handleDayRangeChange}>
+                            {dayRangeOptions.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </Select>
+                    }
                 />
                 {tickets.length === 0 ? (
                     <EmptyState
