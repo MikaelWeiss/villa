@@ -12,8 +12,8 @@ function Card({
   const baseStyles = 'bg-white rounded-xl border border-secondary-100 transition-all duration-300';
 
   const variants = {
-    default: 'shadow-sm hover:shadow-md',
-    elevated: 'shadow-md hover:shadow-lg',
+    default: 'shadow-sm',
+    elevated: 'shadow-md',
     flat: 'shadow-none',
     outline: 'border-2 shadow-none',
   };
@@ -29,7 +29,7 @@ function Card({
   const variantClasses = variants[variant] || variants.default;
   const paddingClasses = paddings[padding] || paddings.md;
   const interactiveClasses = interactive
-    ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-md'
+    ? 'cursor-pointer'
     : '';
 
   if (loading) {
@@ -99,3 +99,4 @@ Card.Content = CardContent;
 Card.Footer = CardFooter;
 
 export default Card;
+ 
