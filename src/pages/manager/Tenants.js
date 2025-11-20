@@ -103,6 +103,10 @@ function ManagerTenantsPage() {
     }
   };
 
+  const handleDidTapTenant = (tenant_id) => {
+    console.log(`Clicked on tenant: ${tenant_id}`)
+  }
+
   const getSortIcon = (column) => {
     if (sortColumn !== column) {
       return <ArrowUpDown size={16} className="text-secondary-400" />;
@@ -253,9 +257,11 @@ function ManagerTenantsPage() {
                   {filteredAndSortedTenants.map((tenant, index) => (
                     <tr
                       key={tenant.tenant_id}
-                      className={`border-b border-secondary-200 last:border-b-0 ${
-index % 2 === 0 ? 'bg-white' : 'bg-secondary-25'
-}`}
+                      className={`border-b border-secondary-200 last:border-b-0 ${ index % 2 === 0 ? 'bg-white' : 'bg-secondary-25' }`}
+                      onClick={() => handleDidTapTenant(tenant.tenant_id)}
+                      style={{ cursor: `pointer` }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
                     >
                       <td className="p-4 text-secondary-800">
                         {tenant.tenant_name || 'Unknown'}
@@ -264,11 +270,7 @@ index % 2 === 0 ? 'bg-white' : 'bg-secondary-25'
                         {tenant.units}
                       </td>
                       <td className="p-4 text-center">
-                        <span className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${
-tenant.openReports > 0
-? 'bg-error-100 text-error-700'
-: 'bg-success-100 text-success-700'
-}`}>
+                        <span className={`inline-block px-3 py-1 rounded-full font-semibold text-sm ${ tenant.openReports > 0 ? 'bg-error-100 text-error-700' : 'bg-success-100 text-success-700' }`}>
                           {tenant.openReports}
                         </span>
                       </td>
