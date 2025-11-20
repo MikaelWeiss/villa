@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "mcp__context7__resolve-library-id"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
