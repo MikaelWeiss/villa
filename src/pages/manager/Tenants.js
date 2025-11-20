@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
 import EmptyState from '../../components/ui/EmptyState';
 import Input from '../../components/ui/Input';
+import TenantDetailsModal from '../../components/TenantDetailsModal.js'
 
 function ManagerTenantsPage() {
   const { profile, role } = useAuth();
@@ -16,6 +17,8 @@ function ManagerTenantsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState('tenant_name');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [isTenantDetailsModalOpen, setIsTenantDetailsModalOpen] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState(null);
 
   const nav = (
     <Nav navElements={[
@@ -103,8 +106,9 @@ function ManagerTenantsPage() {
     }
   };
 
-  const handleDidTapTenant = (tenant_id) => {
-    console.log(`Clicked on tenant: ${tenant_id}`)
+  const handleDidTapTenant = (tenant) => {
+    setSelectedTenant(tenant)
+    setIsTenantDetailsModalOpen(true)
   }
 
   const getSortIcon = (column) => {
@@ -258,7 +262,7 @@ function ManagerTenantsPage() {
                     <tr
                       key={tenant.tenant_id}
                       className={`border-b border-secondary-200 last:border-b-0 ${ index % 2 === 0 ? 'bg-white' : 'bg-secondary-25' }`}
-                      onClick={() => handleDidTapTenant(tenant.tenant_id)}
+                      onClick={() => handleDidTapTenant(tenant)}
                       style={{ cursor: `pointer` }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
@@ -284,6 +288,14 @@ function ManagerTenantsPage() {
             </div>
           )}
       </div>
+      <TenantDetailsModal
+        isOpen={isTenantDetailsModalOpen}
+        onClose={() => {
+          setSelectedTenant(null);
+          setIsTenantDetailsModalOpen(false);
+        }}
+        tenant={selectedTenant}
+      />
     </div>
   )
 }
