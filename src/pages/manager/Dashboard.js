@@ -13,7 +13,8 @@ import {
     Activity,
     TrendingUp,
     ArrowRight,
-    Eye
+    Eye,
+    Shield
 } from "lucide-react";
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
@@ -44,7 +45,7 @@ function ManagerDashboard() {
                 .from('reports')
                 .select('*, organization:organizations(name)');
 
-            if (role === 'manager' && profile?.organization_ids) {
+            if (role === 'manager' || 'admin' && profile?.organization_ids) {
                 query = query.in('organization_id', profile.organization_ids);
             }
 
@@ -155,7 +156,13 @@ function ManagerDashboard() {
                 id: crypto.randomUUID(),
                 icon: <Wrench size={20} />,
                 path: "/manager/reports"
-            }
+            },
+            ...(role === 'manager' ? [{
+                name: "Admin Roles",
+                id: crypto.randomUUID(),
+                icon: <Shield size={20} />,
+                path: "/admin/Roles"
+            }] : [])
         ]}
         />)
 

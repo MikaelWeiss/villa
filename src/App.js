@@ -13,10 +13,16 @@ import TenantPayments from './pages/tenant/Payments';
 import ManagerDashboard from './pages/manager/Dashboard';
 import ManagerReports from './pages/manager/Reports';
 import ManagerTenants from './pages/manager/Tenants';
+import AdminRoles from './pages/admin/Roles';
 
-// Component to handle role-based redirect from root
+
 function RootRedirect() {
-  const { user, role, loading } = useAuth();
+  const { user, role, profile, loading } = useAuth();
+
+  console.log("USER:", user);
+  console.log("ROLE FROM useAuth:", role);
+  console.log("PROFILE LOADED?", profile);
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -26,8 +32,15 @@ function RootRedirect() {
     return <Landing />;
   }
 
-  // Redirect authenticated users to their dashboard
-  const redirectPath = role === 'manager' ? '/manager/dashboard' : '/tenant/dashboard';
+  // Role-based redirect
+  const roleRedirects = {
+    admin: '/manager/dashboard',
+    manager: '/manager/dashboard',
+    tenant: '/tenant/dashboard'
+  };
+
+  const redirectPath = roleRedirects[role] || '/tenant/dashboard';
+
   return <Navigate to={redirectPath} replace />;
 }
 
@@ -72,11 +85,12 @@ function App() {
           <Route
             path="/manager/dashboard"
             element={
-              <ProtectedRoute requireRole="manager">
+              <ProtectedRoute requireRole={["manager", "admin"]}>
                 <ManagerDashboard />
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/manager/tenants"
             element={
@@ -89,6 +103,40 @@ function App() {
             path="/manager/reports"
             element={
               <ProtectedRoute requireRole="manager">
+                <ManagerReports />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin/Roles"
+            element={
+              <ProtectedRoute requireRole="admin">
+                <AdminRoles/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/dashboard"
+            element={
+              <ProtectedRoute requireRole="admin">
+                <ManagerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/tenants"
+            element={
+              <ProtectedRoute requireRole="admin">
+                <ManagerTenants />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/reports"
+            element={
+              <ProtectedRoute requireRole="admin">
                 <ManagerReports />
               </ProtectedRoute>
             }
