@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
 import ManagerMaintenanceList from "../../components/ManagerMaintenanceList";
-import {Wrench, LayoutDashboard, Users} from "lucide-react";
+import {Wrench, LayoutDashboard, Users, Shield} from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
@@ -35,7 +35,13 @@ function ManagerMaintenanceListPage() {
                 id: crypto.randomUUID(),
                 icon: <Wrench size={20} />,
                 path: "/manager/reports"
-            }
+            },
+            ...(role === 'admin' ? [{
+                name: "Admin Roles",
+                id: crypto.randomUUID(),
+                icon: <Shield size={20} />,
+                path: "/admin/roles"
+            }] : [])
         ]}
         />)
 
