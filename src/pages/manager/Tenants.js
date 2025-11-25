@@ -3,10 +3,8 @@ import { supabase } from '../../lib/supabase';
 import Nav from '../../components/nav/Nav.js';
 import { Wrench, LayoutDashboard, Users, ArrowUpDown, ArrowUp, ArrowDown, Search, Shield } from "lucide-react";
 import { useAuth } from '../../contexts/AuthContext';
-import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
 import EmptyState from '../../components/ui/EmptyState';
-import Input from '../../components/ui/Input';
 import TenantDetailsModal from '../../components/TenantDetailsModal.js'
 
 function ManagerTenantsPage() {

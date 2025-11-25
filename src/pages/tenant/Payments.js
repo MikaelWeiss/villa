@@ -1,8 +1,6 @@
 import React from 'react';
 import Nav from '../../components/nav/Nav.js';
-import { useAuth } from '../../contexts/AuthContext';
 import { House, CreditCard, Wrench, Clock } from 'lucide-react';
-import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';
 import EmptyState from '../../components/ui/EmptyState';

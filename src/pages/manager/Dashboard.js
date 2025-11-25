@@ -11,7 +11,6 @@ import {
     Clock,
     CheckCircle,
     Activity,
-    TrendingUp,
     ArrowRight,
     Eye,
     Shield
@@ -23,7 +22,7 @@ import Badge from '../../components/ui/Badge';
 import TicketDetailModal from '../../components/TicketDetailModal';
 
 function ManagerDashboard() {
-    const { profile, role } = useAuth();
+    const { profile, role, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -39,13 +38,17 @@ function ManagerDashboard() {
     const [loadingTicket, setLoadingTicket] = useState(false);
 
     const fetchDashboardData = useCallback(async () => {
-        if (role && !profile) return;
+        if (role && !profile) {
+            console.log('Dashboard: Waiting for profile to load...');
+            return;
+        }
+
         try {
             let query = supabase
                 .from('reports')
                 .select('*, organization:organizations(name)');
 
-            if (role === 'manager' || 'admin' && profile?.organization_ids) {
+            if ((role === 'manager' || role === 'admin') && profile?.organization_ids) {
                 query = query.in('organization_id', profile.organization_ids);
             }
 
@@ -165,8 +168,6 @@ function ManagerDashboard() {
             }] : [])
         ]}
         />)
-
-    const { loading: authLoading } = useAuth();
 
     if (loading || authLoading) {
         return (

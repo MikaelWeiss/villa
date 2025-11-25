@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from './ui/Modal';
 import Badge from './ui/Badge';
 import Button from './ui/Button';
@@ -18,13 +18,7 @@ function TenantDetailsModal({ isOpen, onClose, tenant }) {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && tenant?.tenant_id) {
-      fetchTenantDetails();
-    }
-  }, [isOpen, tenant]);
-
-  const fetchTenantDetails = async () => {
+  const fetchTenantDetails = useCallback(async () => {
     if (!tenant?.tenant_id) return;
 
     setLoading(true);
@@ -79,7 +73,13 @@ function TenantDetailsModal({ isOpen, onClose, tenant }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tenant, role, profile]);
+
+  useEffect(() => {
+    if (isOpen && tenant?.tenant_id) {
+      fetchTenantDetails();
+    }
+  }, [isOpen, tenant, fetchTenantDetails]);
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';

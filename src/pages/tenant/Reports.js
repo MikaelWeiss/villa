@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { House, CreditCard, Wrench } from 'lucide-react';
-import Button from '../../components/ui/Button';
 import PageHeader from '../../components/ui/PageHeader';
 
 function TenantReports() {
