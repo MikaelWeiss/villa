@@ -13,7 +13,6 @@ import {
   Clock,
   CheckCircle2,
   ArrowRight,
-  Sparkles,
   Shield,
   Users,
   Home
@@ -446,9 +445,9 @@ export default function LandingPage() {
               © {new Date().getFullYear()} Villa. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-secondary-500">
-              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-              <a href="#" className="hover:text-primary transition-colors">Terms</a>
-              <a href="#" className="hover:text-primary transition-colors">Contact</a>
+              <button onClick={() => {}} className="hover:text-primary transition-colors">Privacy</button>
+              <button onClick={() => {}} className="hover:text-primary transition-colors">Terms</button>
+              <button onClick={() => {}} className="hover:text-primary transition-colors">Contact</button>
             </div>
           </div>
         </div>

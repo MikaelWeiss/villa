@@ -11,7 +11,6 @@ import {
     Clock,
     CheckCircle,
     Activity,
-    TrendingUp,
     ArrowRight,
     Eye,
     Shield
@@ -45,7 +44,7 @@ function ManagerDashboard() {
                 .from('reports')
                 .select('*, organization:organizations(name)');
 
-            if (role === 'manager' || 'admin' && profile?.organization_ids) {
+            if ((role === 'manager' || role === 'admin') && profile?.organization_ids) {
                 query = query.in('organization_id', profile.organization_ids);
             }
 

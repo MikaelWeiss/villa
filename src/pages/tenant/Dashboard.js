@@ -1,11 +1,9 @@
 import Nav from '../../components/nav/Nav.js';
-import TenantPreviewCard from "../../components/TenantPreviewCard";
-import TenantMaintenanceList from "../../components/TenantMaintenanceList";
 import NewTicketModal from "../../components/NewTicketModal";
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { Wrench, House, CreditCard, Plus, DollarSign, Calendar, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Wrench, House, CreditCard, Plus, DollarSign, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import PageHeader from '../../components/ui/PageHeader';

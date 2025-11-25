@@ -3,7 +3,6 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import PageHeader from '../../components/ui/PageHeader';
 import Select from '../../components/ui/Select';
-import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -12,7 +11,7 @@ import { Users, Search, ArrowUpDown, ArrowUp, ArrowDown, Wrench, LayoutDashboard
 import Nav from '../../components/nav/Nav.js';
 
 const Roles = () => {
-    const { user, profile, role, loading: authLoading } = useAuth();
+    const { user, role, loading: authLoading } = useAuth();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

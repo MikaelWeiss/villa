@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
-import { User, Mail, Building2, Calendar } from 'lucide-react';
+import { Mail, Building2, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -10,13 +10,7 @@ function UserProfileModal({ isOpen, onClose }) {
     const [organizations, setOrganizations] = useState([]);
     const [loadingOrgs, setLoadingOrgs] = useState(true);
 
-    useEffect(() => {
-        if (isOpen && profile?.organization_ids) {
-            fetchOrganizations();
-        }
-    }, [isOpen, profile]);
-
-    const fetchOrganizations = async () => {
+    const fetchOrganizations = useCallback(async () => {
         setLoadingOrgs(true);
         try {
             const { data, error } = await supabase
@@ -32,7 +26,13 @@ function UserProfileModal({ isOpen, onClose }) {
         } finally {
             setLoadingOrgs(false);
         }
-    };
+    }, [profile]);
+
+    useEffect(() => {
+        if (isOpen && profile?.organization_ids) {
+            fetchOrganizations();
+        }
+    }, [isOpen, profile, fetchOrganizations]);
 
     const getUserInitials = () => {
         if (!user?.email) return 'U';
