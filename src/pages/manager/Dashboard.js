@@ -160,11 +160,11 @@ function ManagerDashboard() {
                 icon: <Wrench size={20} />,
                 path: "/manager/reports"
             },
-            ...(role === 'manager' ? [{
+            ...(role === 'admin' ? [{
                 name: "Admin Roles",
                 id: crypto.randomUUID(),
                 icon: <Shield size={20} />,
-                path: "/admin/Roles"
+                path: "/admin/roles"
             }] : [])
         ]}
         />)
