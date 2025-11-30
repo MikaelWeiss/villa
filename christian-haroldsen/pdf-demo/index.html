@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="main.js" type="module" defer></script>
+
+    <!-- og:title | The title of your content. -->
+    <meta property="og:title" content="My Catchy Blog Post Title">
+    <!-- og:type | The type of content (e.g., website, article, video.movie). -->
+    <meta property="og:type" content="article">
+    <!-- og:image | The URL of the image to be displayed in the preview. Crucial for engagement. -->
+    <meta property="og:image" content="https://example.com/image.jpg">
+    <!-- og:url | The canonical URL of the page. Helps consolidate likes/shares. -->
+    <meta property="og:url" content="https://example.com/mypost">
+    <!-- og:description | A brief summary of the content (usually 2-4 sentences). -->
+    <meta property="og:description" content="A short summary of what the article is about.">
+
+    <!-- twitter:card | The type of Twitter card. Common values are summary or summary_large_image. -->
+    <!-- Best Practice Note: You should use summary_large_image for the twitter:card whenever possible,
+    as it results in a larger, more prominent image and typically has a higher CTR. -->
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- twitter:site | The Twitter handle of the website. -->
+    <meta name="twitter:site" content="@yourcompanyname">
+    <!-- twitter:creator | The Twitter handle of the content creator. -->
+    <meta name="twitter:creator" content="@authorname">
+    <!-- twitter:title | The title of your content (can be different from og:title). -->
+    <meta name="twitter:title" content="My Twitter-Friendly Title">
+    <!-- twitter:image | The URL of the image for the card (can be different from og:image). -->
+    <meta name="twitter:image" content="https://example.com/image.jpg">
+</head>
+<body>
+    <button id="download-pdf">download</button>
+    <div id="report">
+        <h1>VILLA REPORT</h1>
+        <table>
+            <thead>
+                <tr><th>date</th><th>unit</th><th>location</th><th>item</th><th>description</th><th>image</th></tr>
+            </thead>
+            <tbody id="report-body">
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
